@@ -1,6 +1,8 @@
 import 'dart:html';
 import 'dart:io';
 import 'dart:typed_data';import 'dart:html' as html; // For browser-specific functionality
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -17,7 +19,7 @@ import 'package:http/http.dart' as http;
 
 class EmployeeService {
   Future<void> registerEmployee(Employee employee,
-      String transportInactiveDate, String dateOfBirth,
+      String transportInactiveDate, String dateOfBirth,BuildContext context,
       String joiningDate) async {
     String url = ApiStringConstants.baseurl + ApiStringConstants.addEmployee;
     try {
@@ -59,14 +61,106 @@ class EmployeeService {
             "office": employee.office,
             "company": companyId,
             "disability": employee.disability,
-            "status": "active"
+            "status": "active",
+            "nodalPoint": employee.nodalPoint,
           });
 
       if (response.data['message'] == 'Employee added successfully') {
-        print('add employee successfull');
+        showDialog(
+            context:context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Employee Added Successfully'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      employee.firstName = '';
+                      employee.middleName = '';
+                      employee.lastName = '';
+                      employee.contactNumber = '';
+                      employee.secondaryContactNumber = '';
+                      employee.employeeId = '';
+                      employee.secondaryId = '';
+                      employee.dateOfBirth = '';
+                      employee.email = '';
+                      employee.joiningDate = '';
+                      employee.supervisorName = '';
+                      employee.isSupervisor = false;
+                      employee.transportInactiveDate = '';
+                      employee.rfid = '';
+                      employee.address = '';
+                      employee.locality = '';
+                      employee.latitude = '';
+                      employee.longitude = '';
+                      employee.age = '';
+                      employee.disability = '';
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        employee.firstName = '';
+        employee.middleName = '';
+        employee.lastName = '';
+        employee.contactNumber = '';
+        employee.secondaryContactNumber = '';
+        employee.employeeId = '';
+        employee.secondaryId = '';
+        employee.dateOfBirth = '';
+        employee.email = '';
+        employee.joiningDate = '';
+        employee.supervisorName = '';
+        employee.isSupervisor = false;
+        employee.transportInactiveDate = '';
+        employee.rfid = '';
+        employee.address = '';
+        employee.locality = '';
+        employee.latitude = '';
+        employee.longitude = '';
+        employee.age = '';
+        employee.disability = '';
+
+      }else{
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Employee Not Added'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
       }
     } catch (e) {
       print('Error adding employee: $e');
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Fill all the fields correctly'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+
     }
   }
 

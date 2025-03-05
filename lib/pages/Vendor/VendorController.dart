@@ -16,30 +16,21 @@ final VendorService vendorService = VendorService();
     vendorList.value = await vendorService.getVendorByCompanyId();
   }
 Future<void> navigateToDetailsPage(String id, BuildContext context) async {
-  // Show the loading screen
-  final overlayContext = Navigator.of(context).overlay?.context;
-  if (overlayContext != null) {
-    Navigator.push(
-      overlayContext,
-      MaterialPageRoute(builder: (context) => const LoadingScreen()),
-    );
-  }
-
   try {
-    // Fetch data
+
     vendorDetails.value = await vendorService.getVendorById(id);
+
+    // Navigate to details page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Vendordetails(), // Pass companyModel if needed
+      ),
+    );
   } catch (e) {
+    // Handle error and dismiss loading dialog
+    Navigator.pop(context);
     print('Error fetching vendor details: $e');
-  } finally {
-    // Navigate to the main details page and remove the loading screen
-    if (overlayContext != null) {
-      Navigator.pushReplacement(
-        overlayContext,
-        MaterialPageRoute(
-          builder: (context) => Vendordetails(), // Pass companyModel if needed
-        ),
-      );
-    }
   }
 }
 

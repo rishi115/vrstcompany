@@ -1,17 +1,99 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:vrsstranslinkcompany/pages/Employee/EmployeeController/EmployeeController.dart';
 import '../../../../constants/responsiveness.dart';
 import '../../../../constants/style.dart';
 import 'package:get/get.dart';
-
+import 'package:http/http.dart' as http;
 import '../../../../widgets/custom_text.dart';
 import '../../../widgets/InputField.dart';
 
 
-class AddEmployeeLarge extends GetView<EmployeeController> {
+class AddEmployeeLarge extends StatefulWidget {
   const AddEmployeeLarge({super.key});
 
+  @override
+  State<AddEmployeeLarge> createState() => _AddEmployeeLargeState();
+}
+
+class _AddEmployeeLargeState extends State<AddEmployeeLarge> {
+  final controller = Get.find<EmployeeController>();
+
+  late GoogleMapController mapController;
+  Set<Marker> markers = {};
+  LatLng initialPosition = LatLng(37.4221, -122.0841); // Example coordinates (Googleplex)
+  List<Set<String>> officeList = [{'Select Office', '8768'}];
+  void _addMarker(LatLng position) {
+    markers.add(
+      Marker(
+        markerId: MarkerId(position.toString()),
+        position: position,
+        infoWindow: InfoWindow(
+          title: 'Your Location',
+          snippet: 'This is your current location',
+        ),
+        icon: BitmapDescriptor.defaultMarker, // Default red marker icon
+      ),
+    );
+    initialPosition = position;
+    setState(() {}); // Update the UI with the new marker
+  }
+  void _onMapTapped(LatLng latLng) async {
+    print("Map tapped at: ${latLng.latitude}, ${latLng.longitude}");
+
+    try {
+      var request = http.Request('GET', Uri.parse('https://vr-safetrips.onrender.com/api/direction/geocode?latitude=${latLng.latitude}&longitude=${latLng.longitude}'));
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+      });
+
+      http.StreamedResponse response = await request.send();
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+        String address = await response.stream.bytesToString();
+        print("Response: $address");
+
+        if (address.isNotEmpty) {
+          Map<String, dynamic> jsonResponse = jsonDecode(address);
+
+          if (jsonResponse["success"] == true && jsonResponse["data"] != null) {
+            List<dynamic> data = jsonResponse["data"];
+
+            if (data.isNotEmpty) {
+              String location = data[0]["formatted_address"];
+              controller.employee.value.address = location;
+              controller.employee.value.locality = location;
+              controller.employee.value.latitude = latLng.latitude.toString();
+              controller.employee.value.longitude = latLng.longitude.toString();
+              setState(() {
+                markers.clear();
+                markers.add(Marker(
+                  markerId: MarkerId(latLng.toString()),
+                  position: latLng,
+                  infoWindow: InfoWindow(title: location), // Show address on marker
+                ));
+              });
+            } else {
+              print("No data found");
+            }
+          } else {
+            print("API Success false or Empty Data");
+          }
+        } else {
+          print("Empty Address Response");
+        }
+      } else {
+        print("Failed with status: ${response.statusCode}");
+      }
+
+    } catch (e) {
+      print("Geocoding Error: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     List<String> gender = ['Male', 'Female', 'Other'];
@@ -48,6 +130,8 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
     List<String>  isSupervisorlist = ['Yes', 'No', 'Other'];
     List<String>  languages = ['English', 'Hindi', 'Tamil', 'Telugu', 'Kannada', 'Malayalam', 'Other'];
 
+
+
     return  ResponsiveWidget.isLargeScreen(context)
         ? Column(
       children: [
@@ -56,10 +140,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             SizedBox(width: 20.w,),
             Field(
               context,
-              'First Name',
+              'First Name*',
               90,
               250,
-              'First Name',
+              'First Name*',
               TextEditingController(text: controller.employee.value.firstName),
                   (value) => controller.employee.update((val) => val!.firstName = value),
             ),
@@ -78,10 +162,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
 
             Field(
               context,
-              'Last Name',
+              'Last Name*',
               90,
               250,
-              'Last Name',
+              'Last Name*',
               TextEditingController(text: controller.employee.value.lastName),
                   (value) => controller.employee.update((val) => val!.lastName = value),
             ),
@@ -96,7 +180,7 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                     Padding(
                       padding:  EdgeInsets.all(8.w),
                       child: CustomText(
-                        text: 'Gender',
+                        text: 'Gender*',
                         size: 15.sp,
                         color: dark,
                         weight: FontWeight.bold,
@@ -105,7 +189,7 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                     Obx(() =>
                         DropDown(
                           context: context,
-                          title: "Gender",
+                          title: "Gender*",
                           items: gender,
                           onChanged: (value) {
                             controller.employee.update((val) => val?.gender = value);
@@ -126,10 +210,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             SizedBox(width: 20.w,),
             Field(
               context,
-              'Primary Contact',
+              'Primary Contact*',
               90,
               250,
-              'Primary Contact',
+              'Primary Contact*',
               TextEditingController(text: controller.employee.value.contactNumber),
                   (value) => controller.employee.update((val) => val!.contactNumber = value),
             ),
@@ -149,10 +233,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
 
             Field(
               context,
-              'Email',
+              'Email*',
               90,
               250,
-              'Email',
+              'Email*',
               TextEditingController(text: controller.employee.value.email),
                   (value) => controller.employee.update((val) => val!.email = value),
             ),
@@ -160,10 +244,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
 
             Field(
               context,
-              'Age',
+              'Age*',
               90,
               250,
-              'Age',
+              'Age*',
               TextEditingController(text: controller.employee.value.age),
                   (value) => controller.employee.update((val) => val!.age = value),
             ),
@@ -306,10 +390,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             ),
             Field(
               context,
-              'Employee ID',
+              'Employee ID*',
               90,
               250,
-              'Employee ID',
+              'Employee ID*',
               TextEditingController(text: controller.employee.value.employeeId),
                   (value) => controller.employee.update((val) => val!.employeeId = value),
             ),
@@ -327,10 +411,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             SizedBox(width: 20.w,),
             Field(
               context,
-              'RFID',
+              'RFID*',
               90,
               250,
-              'RFID',
+              'RFID*',
               TextEditingController(text: controller.employee.value.rfid),
                   (value) => controller.employee.update((val) => val!.rfid = value),
             ),
@@ -349,14 +433,14 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                   Padding(
                     padding:  EdgeInsets.all(8.w),
                     child: CustomText(
-                        text: 'Date of Birth',
+                        text: 'Date of Birth*',
                       size: 15.sp,
                       color: dark,
                       weight: FontWeight.bold,
                     ),
                   ),
                   Obx(() =>  DateFiller(
-                    title: "Date of Birth",
+                    title: "Date of Birth*",
                     context: context,
                     value: controller.DateofBirth.value.isNotEmpty ? controller.DateofBirth.value.toString().split(' ')[0] : 'Select', onChanged: () {
                     controller.SelectDate(context, controller.DateofBirth);
@@ -374,7 +458,7 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                     Padding(
                       padding:  EdgeInsets.all(8.w),
                       child: CustomText(
-                        text: 'Joining Date',
+                        text: 'Joining Date*',
                         size: 15.sp,
                         color: dark,
                         weight: FontWeight.bold,
@@ -382,7 +466,7 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                     ),
                     Obx(() =>
                         DateFiller(
-                          title: "Joining Date",
+                          title: "Joining Date*",
                           context: context,
                           value: controller.DateofJoining.value.isNotEmpty ? controller.DateofJoining.value.toString().split(' ')[0] : 'Select', onChanged: () {
                           controller.SelectDate(context,controller.DateofJoining);
@@ -424,10 +508,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             SizedBox(width: 20.w,),
             Field(
               context,
-              'Disability',
+              'Disability*',
               90,
               250,
-              'Disability',
+              'Disability*',
               TextEditingController(text: controller.employee.value.disability),
                   (value) => controller.employee.update((val) => val!.disability = value),
             ),
@@ -439,10 +523,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             SizedBox(width: 20.w,),
             Field(
               context,
-              'Address',
+              'Address*',
               90,
               250,
-              'Address',
+              'Address*',
               TextEditingController(text: controller.employee.value.address),
                   (value) => controller.employee.update((val) => val!.address = value),
             ),
@@ -460,20 +544,20 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             SizedBox(width: 20.w,),
             Field(
               context,
-              'Latitude',
+              'Latitude*',
               90,
               150,
-              'Latitude',
+              'Latitude*',
               TextEditingController(text: controller.employee.value.latitude),
                   (value) => controller.employee.update((val) => val!.latitude = value),
             ),
             SizedBox(width: 20.w,),
             Field(
               context,
-              'Longitude',
+              'Longitude*',
               90,
               150,
-              'Longitude',
+              'Longitude*',
               TextEditingController(text: controller.employee.value.longitude),
                   (value) => controller.employee.update((val) => val!.longitude = value),
             ),
@@ -501,6 +585,32 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
               ),
             ),
           ],
+        ),
+
+        SizedBox(height: 10,),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+              width: 400.w,
+              height:400.h,
+              child: GoogleMap(
+                mapType: MapType.normal,
+                myLocationEnabled: true,
+                zoomGesturesEnabled: true,
+                zoomControlsEnabled: true,
+                markers: markers, // Set of markers on the map
+                initialCameraPosition: CameraPosition(
+                  target: initialPosition,
+                  zoom: 14.0, // Zoom level
+                ),
+                onMapCreated: (GoogleMapController controller) {
+                  mapController = controller;
+                },
+                onTap: (LatLng latLng) {
+                  _onMapTapped(latLng);
+                },
+              )
+          ),
         ),
         SizedBox(height: 10,),
         Row(
@@ -575,7 +685,7 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                     Padding(
                       padding:  EdgeInsets.all(8.w),
                       child: CustomText(
-                        text: 'Office',
+                        text: 'Office*',
                         size: 15.sp,
                         color: dark,
                         weight: FontWeight.bold,
@@ -586,7 +696,7 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                           child: DropDown(
                             fontsize: 15,
                             context: context,
-                            title: "Select Office",
+                            title: "Select Office*",
                             items: officeListMap,
                             onChanged: (value) {
                               controller.employee.value.office = officeMap[value]!;
@@ -835,10 +945,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             ),
             Field(
               context,
-              'Employee ID',
+              'Employee ID*',
               90,
               250,
-              'Employee ID',
+              'Employee ID*',
               TextEditingController(text: controller.employee.value.employeeId),
                   (value) => controller.employee.update((val) => val!.employeeId = value),
             ),
@@ -856,10 +966,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
             SizedBox(width: 20.w,),
             Field(
               context,
-              'RFID',
+              'RFID*',
               90,
               250,
-              'RFID',
+              'RFID*',
               TextEditingController(text: controller.employee.value.rfid),
                   (value) => controller.employee.update((val) => val!.rfid = value),
             ),
@@ -1569,6 +1679,10 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                       items: PickupList,
                       onChanged: (value) {
                         controller.employee.update((val) => val!.pickupReimbursementZone = [value]);
+                        String? selectedId =  DropMap[value];
+                        controller.employee.value.nodalPoint = selectedId!;
+                        print("Selected ID: $selectedId");
+
                       },
                       selectedItem: controller.employee.value.pickupReimbursementZone==null ? 'Select' : controller.employee.value.pickupReimbursementZone![0]!,
                       fontsize: 60,
@@ -1600,6 +1714,7 @@ class AddEmployeeLarge extends GetView<EmployeeController> {
                       items: DropList,
                       onChanged: (value) {
                         controller.employee.update((val) => val!.dropReimbursementZone = [value]);
+
                       },
                       selectedItem:   controller.employee.value.dropReimbursementZone==null ? 'Select' : controller.employee.value.dropReimbursementZone![0]!,
                       fontsize: 60,

@@ -1,303 +1,327 @@
+
 class TripByDate {
-  TripByDate({
-    required this.id,
-    required this.shift,
-    required this.date,
-    required this.isGuard,
-    required this.isGuardLoggedIn,
-    required this.capacity,
-    required this.approxStartTime,
-    required this.approxEndTime,
-    required this.listOfEmployees,
-    required this.tripType,
-    required this.vendor,
-    required this.vehicle,
-    required this.company,
-    required this.driver,
-    required this.guard,
-    required this.office,
-    required this.started,
-    required this.status,
-    required this.providedRoute,
-    required this.travelledRoute,
-    required this.ota,
-    required this.otd,
-    required this.driverName,
-    required this.vehicleNumber,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
-    required this.tripStartTime,
-    required this.tripEndTime,
-  });
+  String? id;
+  Shift? shift;
+  String? date;
+  bool? isGuard;
+  bool? isGuardLoggedIn;
+  int? capacity;
+  String? approxStartTime;
+  String? approxEndTime;
+  List<ListOfEmployees>? listOfEmployees;
+  String? tripType;
+  String? vendor;
+  Vehicle? vehicle;
+  String? company;
+  Driver? driver;
+  dynamic guard;
+  String? office;
+  bool? started;
+  String? startDateTime;
+  String? endDateTime;
+  String? status;
+  List<ProvidedRoute>? providedRoute;
+  List<dynamic>? travelledRoute;
+  int? ota;
+  int? otd;
+  String? driverName;
+  String? vehicleNumber;
+  String? createdAt;
+  String? updatedAt;
+  int? v;
+  String? tripStartTime;
 
-  final String? id;
-  final Shift? shift;
-  final DateTime? date;
-  final bool? isGuard;
-  final bool? isGuardLoggedIn;
-  final int? capacity;
-  final String? approxStartTime;
-  final String? approxEndTime;
-  final List<ListOfEmployee> listOfEmployees;
-  final String? tripType;
-  final String? vendor;
-  final String? vehicle;
-  final String? company;
-  final String? driver;
-  final dynamic guard;
-  final String? office;
-  final bool? started;
-  final String? status;
-  final List<ProvidedRoute> providedRoute;
-  final List<dynamic> travelledRoute;
-  final int? ota;
-  final int? otd;
-  final String? driverName;
-  final String? vehicleNumber;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final int? v;
-  final String? tripStartTime;
-  final String? tripEndTime;
+  TripByDate({this.id, this.shift, this.date, this.isGuard, this.isGuardLoggedIn, this.capacity, this.approxStartTime, this.approxEndTime, this.listOfEmployees, this.tripType, this.vendor, this.vehicle, this.company, this.driver, this.guard, this.office, this.started, this.startDateTime, this.endDateTime, this.status, this.providedRoute, this.travelledRoute, this.ota, this.otd, this.driverName, this.vehicleNumber, this.createdAt, this.updatedAt, this.v, this.tripStartTime});
 
-  factory TripByDate.fromJson(Map<String, dynamic> json){
-    return TripByDate(
-      id: json["_id"],
-      shift: json["shift"] == null ? null : Shift.fromJson(json["shift"]),
-      date: DateTime.tryParse(json["date"] ?? ""),
-      isGuard: json["isGuard"],
-      isGuardLoggedIn: json["isGuardLoggedIn"],
-      capacity: json["capacity"],
-      approxStartTime: json["approxStartTime"],
-      approxEndTime: json["approxEndTime"],
-      listOfEmployees: json["listOfEmployees"] == null ? [] : List<ListOfEmployee>.from(json["listOfEmployees"]!.map((x) => ListOfEmployee.fromJson(x))),
-      tripType: json["tripType"],
-      vendor: json["vendor"],
-      vehicle: json["vehicle"],
-      company: json["company"],
-      driver: json["driver"],
-      guard: json["guard"],
-      office: json["office"],
-      started: json["started"],
-      status: json["status"],
-      providedRoute: json["providedRoute"] == null ? [] : List<ProvidedRoute>.from(json["providedRoute"]!.map((x) => ProvidedRoute.fromJson(x))),
-      travelledRoute: json["travelledRoute"] == null ? [] : List<dynamic>.from(json["travelledRoute"]!.map((x) => x)),
-      ota: json["ota"],
-      otd: json["otd"],
-      driverName: json["driverName"],
-      vehicleNumber: json["vehicleNumber"],
-      createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
-      v: json["__v"],
-      tripStartTime: json["tripStartTime"],
-      tripEndTime: json["tripEndTime"],
-    );
+  TripByDate.fromJson(Map<String, dynamic> json) {
+    id = json["_id"];
+    shift = json["shift"] == null ? null : Shift.fromJson(json["shift"]);
+    date = json["date"];
+    isGuard = json["isGuard"];
+    isGuardLoggedIn = json["isGuardLoggedIn"];
+    capacity = json["capacity"];
+    approxStartTime = json["approxStartTime"];
+    approxEndTime = json["approxEndTime"];
+    listOfEmployees = json["listOfEmployees"] == null ? null : (json["listOfEmployees"] as List).map((e) => ListOfEmployees.fromJson(e)).toList();
+    tripType = json["tripType"];
+    vendor = json["vendor"];
+    vehicle = json["vehicle"] == null ? null : Vehicle.fromJson(json["vehicle"]);
+    company = json["company"];
+    driver = json["driver"] == null ? null : Driver.fromJson(json["driver"]);
+    guard = json["guard"];
+    office = json["office"];
+    started = json["started"];
+    startDateTime = json["startDateTime"];
+    endDateTime = json["endDateTime"];
+    status = json["status"];
+    providedRoute = json["providedRoute"] == null ? null : (json["providedRoute"] as List).map((e) => ProvidedRoute.fromJson(e)).toList();
+    travelledRoute = json["travelledRoute"] ?? [];
+    ota = json["ota"];
+    otd = json["otd"];
+    driverName = json["driverName"];
+    vehicleNumber = json["vehicleNumber"];
+    createdAt = json["createdAt"];
+    updatedAt = json["updatedAt"];
+    v = json["__v"];
+    tripStartTime = json["tripStartTime"];
   }
 
-  Map<String, dynamic> toJson() => {
-    "_id": id,
-    "shift": shift?.toJson(),
-    "date": date?.toIso8601String(),
-    "isGuard": isGuard,
-    "isGuardLoggedIn": isGuardLoggedIn,
-    "capacity": capacity,
-    "approxStartTime": approxStartTime,
-    "approxEndTime": approxEndTime,
-    "listOfEmployees": listOfEmployees.map((x) => x?.toJson()).toList(),
-    "tripType": tripType,
-    "vendor": vendor,
-    "vehicle": vehicle,
-    "company": company,
-    "driver": driver,
-    "guard": guard,
-    "office": office,
-    "started": started,
-    "status": status,
-    "providedRoute": providedRoute.map((x) => x?.toJson()).toList(),
-    "travelledRoute": travelledRoute.map((x) => x).toList(),
-    "ota": ota,
-    "otd": otd,
-    "driverName": driverName,
-    "vehicleNumber": vehicleNumber,
-    "createdAt": createdAt?.toIso8601String(),
-    "updatedAt": updatedAt?.toIso8601String(),
-    "__v": v,
-    "tripStartTime": tripStartTime,
-    "tripEndTime": tripEndTime,
-  };
-
-}
-
-class ListOfEmployee {
-  ListOfEmployee({
-    required this.employeeId,
-    required this.employeeName,
-    required this.nodalId,
-    required this.nodalName,
-    required this.nodalLat,
-    required this.nodalLng,
-    required this.nodalDistance,
-    required this.homeLat,
-    required this.otp,
-    required this.homeLng,
-    required this.nodalZone,
-    required this.pickupTime,
-    required this.pickupLocation,
-    required this.dropLocation,
-    required this.phoneNumber,
-    required this.status,
-    required this.id,
-  });
-
-  final String? employeeId;
-  final String? employeeName;
-  final String? nodalId;
-  final String? nodalName;
-  final double? nodalLat;
-  final double? nodalLng;
-  final double? nodalDistance;
-  final double? homeLat;
-  final int? otp;
-  final double? homeLng;
-  final String? nodalZone;
-  final String? pickupTime;
-  final PLocation? pickupLocation;
-  final PLocation? dropLocation;
-  final String? phoneNumber;
-  final String? status;
-  final String? id;
-
-  factory ListOfEmployee.fromJson(Map<String, dynamic> json){
-    return ListOfEmployee(
-      employeeId: json["employeeId"],
-      employeeName: json["employeeName"],
-      nodalId: json["nodalId"],
-      nodalName: json["nodalName"],
-      nodalLat: json["nodalLat"],
-      nodalLng: json["nodalLng"],
-      nodalDistance: json["nodalDistance"],
-      homeLat: json["homeLat"],
-      otp: json["otp"],
-      homeLng: json["homeLng"],
-      nodalZone: json["nodalZone"],
-      pickupTime: json["pickupTime"],
-      pickupLocation: json["pickupLocation"] == null ? null : PLocation.fromJson(json["pickupLocation"]),
-      dropLocation: json["dropLocation"] == null ? null : PLocation.fromJson(json["dropLocation"]),
-      phoneNumber: json["phoneNumber"],
-      status: json["status"],
-      id: json["_id"],
-    );
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["_id"] = id;
+    if(shift != null) {
+      _data["shift"] = shift?.toJson();
+    }
+    _data["date"] = date;
+    _data["isGuard"] = isGuard;
+    _data["isGuardLoggedIn"] = isGuardLoggedIn;
+    _data["capacity"] = capacity;
+    _data["approxStartTime"] = approxStartTime;
+    _data["approxEndTime"] = approxEndTime;
+    if(listOfEmployees != null) {
+      _data["listOfEmployees"] = listOfEmployees?.map((e) => e.toJson()).toList();
+    }
+    _data["tripType"] = tripType;
+    _data["vendor"] = vendor;
+    if(vehicle != null) {
+      _data["vehicle"] = vehicle?.toJson();
+    }
+    _data["company"] = company;
+    if(driver != null) {
+      _data["driver"] = driver?.toJson();
+    }
+    _data["guard"] = guard;
+    _data["office"] = office;
+    _data["started"] = started;
+    _data["startDateTime"] = startDateTime;
+    _data["endDateTime"] = endDateTime;
+    _data["status"] = status;
+    if(providedRoute != null) {
+      _data["providedRoute"] = providedRoute?.map((e) => e.toJson()).toList();
+    }
+    if(travelledRoute != null) {
+      _data["travelledRoute"] = travelledRoute;
+    }
+    _data["ota"] = ota;
+    _data["otd"] = otd;
+    _data["driverName"] = driverName;
+    _data["vehicleNumber"] = vehicleNumber;
+    _data["createdAt"] = createdAt;
+    _data["updatedAt"] = updatedAt;
+    _data["__v"] = v;
+    _data["tripStartTime"] = tripStartTime;
+    return _data;
   }
-
-  Map<String, dynamic> toJson() => {
-    "employeeId": employeeId,
-    "employeeName": employeeName,
-    "nodalId": nodalId,
-    "nodalName": nodalName,
-    "nodalLat": nodalLat,
-    "nodalLng": nodalLng,
-    "nodalDistance": nodalDistance,
-    "homeLat": homeLat,
-    "otp": otp,
-    "homeLng": homeLng,
-    "nodalZone": nodalZone,
-    "pickupTime": pickupTime,
-    "pickupLocation": pickupLocation?.toJson(),
-    "dropLocation": dropLocation?.toJson(),
-    "phoneNumber": phoneNumber,
-    "status": status,
-    "_id": id,
-  };
-
-}
-
-class PLocation {
-  PLocation({
-    required this.latitude,
-    required this.longitude,
-    required this.id,
-  });
-
-  final double? latitude;
-  final double? longitude;
-  final String? id;
-
-  factory PLocation.fromJson(Map<String, dynamic> json){
-    return PLocation(
-      latitude: json["latitude"],
-      longitude: json["longitude"],
-      id: json["_id"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "latitude": latitude,
-    "longitude": longitude,
-    "_id": id,
-  };
-
 }
 
 class ProvidedRoute {
-  ProvidedRoute({
-    required this.lat,
-    required this.lng,
-  });
+  double? lat;
+  double? lng;
 
-  final double? lat;
-  final double? lng;
+  ProvidedRoute({this.lat, this.lng});
 
-  factory ProvidedRoute.fromJson(Map<String, dynamic> json){
-    return ProvidedRoute(
-      lat: json["lat"],
-      lng: json["lng"],
-    );
+  ProvidedRoute.fromJson(Map<String, dynamic> json) {
+    lat = json["lat"];
+    lng = json["lng"];
   }
 
-  Map<String, dynamic> toJson() => {
-    "lat": lat,
-    "lng": lng,
-  };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["lat"] = lat;
+    _data["lng"] = lng;
+    return _data;
+  }
+}
 
+class Driver {
+  String? id;
+  String? contactNumber;
+  String? gender;
+  String? dob;
+
+  Driver({this.id, this.contactNumber, this.gender, this.dob});
+
+  Driver.fromJson(Map<String, dynamic> json) {
+    id = json["_id"];
+    contactNumber = json["contactNumber"];
+    gender = json["gender"];
+    dob = json["dob"];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["_id"] = id;
+    _data["contactNumber"] = contactNumber;
+    _data["gender"] = gender;
+    _data["dob"] = dob;
+    return _data;
+  }
+}
+
+class Vehicle {
+  String? id;
+  String? vehicleType;
+  String? vehicleModel;
+
+  Vehicle({this.id, this.vehicleType, this.vehicleModel});
+
+  Vehicle.fromJson(Map<String, dynamic> json) {
+    id = json["_id"];
+    vehicleType = json["vehicleType"];
+    vehicleModel = json["vehicleModel"];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["_id"] = id;
+    _data["vehicleType"] = vehicleType;
+    _data["vehicleModel"] = vehicleModel;
+    return _data;
+  }
+}
+
+class ListOfEmployees {
+  String? employeeId;
+  String? employeeName;
+  String? nodalId;
+  String? nodalName;
+  String? nodalAddress;
+  double? nodalLat;
+  double? nodalLng;
+  double? nodalDistance;
+  double? homeLat;
+  int? otp;
+  double? homeLng;
+  String? nodalZone;
+  String? pickupTime;
+  PickupLocation? pickupLocation;
+  DropLocation? dropLocation;
+  String? phoneNumber;
+  String? status;
+  String? id;
+
+  ListOfEmployees({this.employeeId, this.employeeName, this.nodalId, this.nodalName, this.nodalAddress, this.nodalLat, this.nodalLng, this.nodalDistance, this.homeLat, this.otp, this.homeLng, this.nodalZone, this.pickupTime, this.pickupLocation, this.dropLocation, this.phoneNumber, this.status, this.id});
+
+  ListOfEmployees.fromJson(Map<String, dynamic> json) {
+    employeeId = json["employeeId"];
+    employeeName = json["employeeName"];
+    nodalId = json["nodalId"];
+    nodalName = json["nodalName"];
+    nodalAddress = json["nodalAddress"];
+    nodalLat = json["nodalLat"];
+    nodalLng = json["nodalLng"];
+    nodalDistance = json["nodalDistance"];
+    homeLat = json["homeLat"];
+    otp = json["otp"];
+    homeLng = json["homeLng"];
+    nodalZone = json["nodalZone"];
+    pickupTime = json["pickupTime"];
+    pickupLocation = json["pickupLocation"] == null ? null : PickupLocation.fromJson(json["pickupLocation"]);
+    dropLocation = json["dropLocation"] == null ? null : DropLocation.fromJson(json["dropLocation"]);
+    phoneNumber = json["phoneNumber"];
+    status = json["status"];
+    id = json["_id"];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["employeeId"] = employeeId;
+    _data["employeeName"] = employeeName;
+    _data["nodalId"] = nodalId;
+    _data["nodalName"] = nodalName;
+    _data["nodalAddress"] = nodalAddress;
+    _data["nodalLat"] = nodalLat;
+    _data["nodalLng"] = nodalLng;
+    _data["nodalDistance"] = nodalDistance;
+    _data["homeLat"] = homeLat;
+    _data["otp"] = otp;
+    _data["homeLng"] = homeLng;
+    _data["nodalZone"] = nodalZone;
+    _data["pickupTime"] = pickupTime;
+    if(pickupLocation != null) {
+      _data["pickupLocation"] = pickupLocation?.toJson();
+    }
+    if(dropLocation != null) {
+      _data["dropLocation"] = dropLocation?.toJson();
+    }
+    _data["phoneNumber"] = phoneNumber;
+    _data["status"] = status;
+    _data["_id"] = id;
+    return _data;
+  }
+}
+
+class DropLocation {
+  double? latitude;
+  double? longitude;
+  String? id;
+
+  DropLocation({this.latitude, this.longitude, this.id});
+
+  DropLocation.fromJson(Map<String, dynamic> json) {
+    latitude = json["latitude"];
+    longitude = json["longitude"];
+    id = json["_id"];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["latitude"] = latitude;
+    _data["longitude"] = longitude;
+    _data["_id"] = id;
+    return _data;
+  }
+}
+
+class PickupLocation {
+  double? latitude;
+  double? longitude;
+  String? id;
+
+  PickupLocation({this.latitude, this.longitude, this.id});
+
+  PickupLocation.fromJson(Map<String, dynamic> json) {
+    latitude = json["latitude"];
+    longitude = json["longitude"];
+    id = json["_id"];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["latitude"] = latitude;
+    _data["longitude"] = longitude;
+    _data["_id"] = id;
+    return _data;
+  }
 }
 
 class Shift {
-  Shift({
-    required this.id,
-    required this.loginTime,
-    required this.logoutTime,
-    required this.tripType,
-    required this.company,
-    required this.v,
-  });
+  String? id;
+  String? loginTime;
+  String? logoutTime;
+  String? tripType;
+  String? company;
+  int? v;
 
-  final String? id;
-  final String? loginTime;
-  final String? logoutTime;
-  final String? tripType;
-  final String? company;
-  final int? v;
+  Shift({this.id, this.loginTime, this.logoutTime, this.tripType, this.company, this.v});
 
-  factory Shift.fromJson(Map<String, dynamic> json){
-    return Shift(
-      id: json["_id"],
-      loginTime: json["loginTime"],
-      logoutTime: json["logoutTime"],
-      tripType: json["tripType"],
-      company: json["company"],
-      v: json["__v"],
-    );
+  Shift.fromJson(Map<String, dynamic> json) {
+    id = json["_id"];
+    loginTime = json["loginTime"];
+    logoutTime = json["logoutTime"];
+    tripType = json["tripType"];
+    company = json["company"];
+    v = json["__v"];
   }
 
-  Map<String, dynamic> toJson() => {
-    "_id": id,
-    "loginTime": loginTime,
-    "logoutTime": logoutTime,
-    "tripType": tripType,
-    "company": company,
-    "__v": v,
-  };
-
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["_id"] = id;
+    _data["loginTime"] = loginTime;
+    _data["logoutTime"] = logoutTime;
+    _data["tripType"] = tripType;
+    _data["company"] = company;
+    _data["__v"] = v;
+    return _data;
+  }
 }
-

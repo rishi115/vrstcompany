@@ -33,8 +33,27 @@ class EmployeeDetailField extends GetView<EmployeeController> {
           ],
         ),
         ),
+        
         const SizedBox(
-          height: 35,
+          height: 15,
+        ),
+        InkWell(
+          onTap: (){
+            Navigator.pop(context);
+          },
+          child: SizedBox(
+            width: 100.w,
+            height: 40.h,
+            child: Center(
+              child: CustomText(
+                  text:"Back",
+                size: 14.sp,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 15,
         ),
         ResponsiveWidget.isLargeScreen(context)?Row(
           children: [
@@ -57,9 +76,8 @@ class EmployeeDetailField extends GetView<EmployeeController> {
               color: light,size:ResponsiveWidget.isSmallScreen(context) ?80.sp:24.sp),
           ],
         ),
-        SizedBox(
-          height: 20.h,
-        ),
+
+
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,

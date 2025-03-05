@@ -10,6 +10,7 @@ import 'package:vrsstranslinkcompany/widgets/custom_text.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../widgets/ShimmerEfflect.dart';
+import '../Setting/AddOffice.dart';
 import 'Widget/DropDownShift.dart';
 import 'Widget/OtaOtdwidget.dart';
 import 'Widget/PieChart.dart';
@@ -438,6 +439,82 @@ class HomePage extends GetView<HomeController> {
           ),
         ],
       );
+    }
+    if(controller.officeList.isEmpty){
+      Future.delayed(Duration.zero, () {
+        Get.dialog(
+          Dialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20)),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              width: 400.w,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.amber,
+                    size: 80,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Office Not Added",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "You need to add the office first before creating a trip.",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: Text("Cancel", style: TextStyle(color: Colors
+                            .grey[600])),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(horizontal: 30,
+                              vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Get.back();
+                          // Navigate to Add Office Screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddOffice(),
+                            ),
+                          );
+                        },
+                        child: const Text("Add Office", style: TextStyle(
+                            color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          barrierDismissible: false,
+        );
+      });
     }
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,

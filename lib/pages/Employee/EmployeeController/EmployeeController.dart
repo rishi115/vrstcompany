@@ -32,6 +32,11 @@ class EmployeeController extends GetxController{
   var nodalList = [].obs;
   var loading = false.obs;
   var officeName = ''.obs;
+  var statusFilterList=<String>["active","inactive"].obs;
+  var selectedStatus = ''.obs;
+
+
+
 
   Future<void> SelectDate(BuildContext context,RxString datepicked) async {
     final DateTime currentDate = DateTime.now();
@@ -72,16 +77,18 @@ class EmployeeController extends GetxController{
   //   _employeeService.employeeReport(id);
   // }
 
-  registerEmployee(){
+  registerEmployee(
+      BuildContext context,
+      ){
   employee.value.gender ??= selectedCategory.value;
   employee.value.languagesKnown ??= [launguageknown.value];
   employee.value.isSupervisor ??= false;
   employee.value.employmentType ??= employmenttype.value;
-  employee.value.pickupReimbursementZone ??= ['Dhaka'];
-  employee.value.dropReimbursementZone ??= ['Dhaka'];
+
 
   _employeeService.registerEmployee(employee.value,
-      TransportInactiveday.value,DateofBirth.value,DateofJoining.value);
+      TransportInactiveday.value,DateofBirth.value,context,DateofJoining.value
+  );
   }
 
   Future<EmployeeDetails> getEmployeeDetails(String id){
@@ -108,6 +115,7 @@ class EmployeeController extends GetxController{
       }).toList();
     }
   }
+
   Future<void> allApi() async {
     loading.value = true;
     await Future.wait([

@@ -109,9 +109,18 @@ class RoutesWidget extends GetView<RoasterController> {
                   const Spacer(),
                   Center(
                     child: InkWell(
-                      onTap:controller.isApproveVendor.value ? () async {
+                      onTap:!controller.isApproveVendor.value ? () async {
+                        if(
+                        controller.ApproveVendor.length == 0
+                        ){
+                          Get.snackbar("Error", "Please select a route to assign vendor");
+                          return;
+                        }
                         Navigator.pushNamed(context, "/loading");
                         await controller.approveVendor();
+                        controller.isApproveVendor.value = true;
+                        controller.ApproveVendor.clear();
+
                         Navigator.pop(context);
                       }
                           : null,
@@ -135,7 +144,8 @@ class RoutesWidget extends GetView<RoasterController> {
                   ),
                   Center(
                     child: InkWell(
-                      onTap: !controller.isApproveVendor.value ?(){
+                      onTap: controller.isApproveVendor.value ?(){
+
                         controller.publishRoute();
                       }: null,
                       child: Container(
@@ -592,7 +602,7 @@ class _routeListState extends State<routeList> {
                     ),
                     Center(
                       child: CustomText(
-                        text: "${(routes.estimatedDuration??0 / 60).toStringAsFixed(1)} Hrs",
+                        text: "${(routes.estimatedDuration)} min",
                         size: 13,
                       ),
                     ),

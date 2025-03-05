@@ -56,11 +56,8 @@ class CompanySideMenu extends StatelessWidget {
                           itemName: item.name,
                           onTap: () {
                             if(item.route == authenticationPageRoute){
-
                               removeAllFromCache();
-
                               menuController.changeActiveItemTo(homePageDisplayName);
-
                             }
                             if (!menuController.isActive(item.name)) {
                               menuController.changeActiveItemTo(item.name);

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../constants/controllers.dart';
 import '../../constants/style.dart';
 import '../../constants/responsiveness.dart';
+import '../../widgets/InputField.dart';
 import '../../widgets/custom_text.dart';
 import 'Widget/EmployeeDetails/EmployeeDetailesPage.dart';
 
@@ -107,6 +108,56 @@ class EmployeePage extends GetView<EmployeeController> {
         ),
         const SizedBox(
           height: 20,
+        ),
+        // Row(
+        //   children:[
+        //     Obx(()=>Padding(
+        //       padding:  EdgeInsets.all(18.h),
+        //       child: Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           const CustomText(
+        //             text: "Office",
+        //           ),
+        //           SizedBox(
+        //             height: 10.h,
+        //           ),
+        //
+        //           Container(
+        //             constraints: const BoxConstraints(
+        //               maxWidth: 270,
+        //             ),
+        //             decoration: BoxDecoration(
+        //               color: Colors.white,
+        //               borderRadius: BorderRadius.circular(15.r),
+        //               border: Border.all(
+        //                 color: Colors.grey.withOpacity(0.5),
+        //               ),
+        //             ),
+        //             height: 50,
+        //             child: SingleChildScrollView(
+        //               scrollDirection: Axis.horizontal,
+        //               child: SizedBox(
+        //                 width: 250.w,
+        //                 child:DropDown(
+        //                   fontsize: 15,
+        //                   context: context,
+        //                   title: "Select Office",
+        //                   items: controller.statusFilterList as List<String>,
+        //                   onChanged: (value) {
+        //                   },
+        //                   selectedItem: controller.selectedStatus.value==''?'Select Office':controller.selectedStatus.value,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),),
+        //   ]
+        // ),
+        SizedBox(
+          height: 20.h,
         ),
         const Expanded(child: EmployeeDetails()),
 

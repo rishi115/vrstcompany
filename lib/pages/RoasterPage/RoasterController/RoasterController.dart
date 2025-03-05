@@ -29,6 +29,7 @@ import 'dart:convert';
 
 
 class RoasterController extends GetxController{
+
   RoasterService roasterService = RoasterService();
   // final TripService tripService = TripService();
   var vehicleList = <VehicleCapacity>[].obs;
@@ -86,6 +87,7 @@ class RoasterController extends GetxController{
 
 
   bool canSelectRoute(bool isAssignedRoute) {
+
     isApproveVendor.value = isAssignedRoute;
     return ApproveVendor.isEmpty ||
         ApproveVendor.every((id) =>

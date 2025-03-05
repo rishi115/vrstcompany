@@ -23,7 +23,9 @@ class ApiUtils {
     ));
     _dio.interceptors.add(InterceptorsWrapper(
       onError: (DioError error, handler) async {
-        if (error.response?.statusCode == 400) {
+        if (error.response?.statusCode == 400 &&
+        error.response?.data['message'] == "Invalid token"
+        ) {
           // Token expired logic
           handleSessionExpired();
         }

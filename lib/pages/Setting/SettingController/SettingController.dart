@@ -39,6 +39,7 @@ class SettingController extends GetxController {
   var image = ''.obs;
   var adharCard = ''.obs;
 
+
   Future<String> chooseFileUsingFilePicker() async {
     var result = await FilePicker.platform.pickFiles();
     if (result != null) {
@@ -103,6 +104,12 @@ class SettingController extends GetxController {
     _settingsService.getAllShift();
   }
 
+  getAllShift() async {
+
+    await _settingsService.getAllShift().then((value) {
+      shiftList.value = value;
+    });
+  }
   getAgency() async {
    await _settingsService.getAllAgency().then((value) {
       agencyList.value = value;
@@ -122,10 +129,13 @@ addGuard(
     guard.value.adharCard = adharCard.value;
   await _settingsService.addGuard(guard.value,context);}
 
-  Future<void> addOffice() async {
+  Future<void> addOffice(
+      BuildContext context
+      ) async {
     loading.value = true;
     try {
       await _settingsService.addOffice(office.value);
+      Navigator.pop(context);
     } catch (error) {
       print("Failed to add office: $error");
     } finally {

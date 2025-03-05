@@ -108,10 +108,13 @@ class CompanyCard extends GetView<VendorController> {
             style: TextStyle(color: Colors.grey),
           ),
           SizedBox(width: 8.w),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+          SizedBox(
+            width: 300.w,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

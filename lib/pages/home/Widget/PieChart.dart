@@ -1,10 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:vrsstranslinkcompany/widgets/ShimmerEfflect.dart';
 import '../../../constants/style.dart';
 import 'package:get/get.dart';
 
+import '../../../widgets/ShimmerEfflect.dart';
 import '../homecontroller/homecontroller.dart';
 
 class Indicator extends StatelessWidget {

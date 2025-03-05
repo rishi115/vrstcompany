@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:vrsstranslinkcompany/pages/Setting/SettingController/SettingController.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get.dart';
@@ -8,97 +9,104 @@ import '../../constants/responsiveness.dart';
 import '../../constants/style.dart';
 import '../../widgets/InputField.dart';
 import '../../widgets/custom_text.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class AddOffice extends GetView<SettingController> {
+
+class AddOffice extends StatefulWidget {
   const AddOffice({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    void _showMyDialog(BuildContext context) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            surfaceTintColor: Colors.white,
-            title: Text('Assign Supervisor'),
-            content: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: ListBody(
-                children: <Widget>[
-                  Container(
-                    width: 700,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey.withOpacity(0.5)),
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search Employee name, Id',
-                        hintStyle: const TextStyle(color: Colors.black),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(10),
+  State<AddOffice> createState() => _AddOfficeState();
+}
+
+class _AddOfficeState extends State<AddOffice> {
+  final controller = Get.put(SettingController());
+  void _showMyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          title: Text('Assign Supervisor'),
+          content: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: ListBody(
+              children: <Widget>[
+                Container(
+                  width: 700,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                  ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search Employee name, Id',
+                      hintStyle: const TextStyle(color: Colors.black),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Padding(
+                          padding: const EdgeInsets.only(right:18.0),
+                          child: Image.asset('assets/SearchIcon.png',width: 27,height: 27,),
                         ),
-                        suffixIcon: IconButton(
-                          icon: Padding(
-                            padding: const EdgeInsets.only(right:18.0),
-                            child: Image.asset('assets/SearchIcon.png',width: 27,height: 27,),
-                          ),
-                          onPressed: () {
-                            // Add any functionality you want when the icon is pressed
-                          },
-                        ),
+                        onPressed: () {
+                          // Add any functionality you want when the icon is pressed
+                        },
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  Divider(),
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                Divider(),
+                Row(
+                  children: [
+                    CustomText(
+                      text: "Sr No.",
+                      size: 15,
+                      weight: FontWeight.w100,
+                    ),
+                    SizedBox(
+                      width: 50.w,
+                    ),
+                    CustomText(
+                      text: "Employee Name",
+                      size: 15,
+                      weight: FontWeight.w100,
+                    ),
+                    SizedBox(
+                      width: 50.w,
+                    ),
+                    CustomText(
+                      text: "Gender",
+                      size: 15,
+                      weight: FontWeight.w100,
+                    ),
+                    SizedBox(
+                      width: 50.w,
+                    ),
+                    CustomText(
+                      text: "Address",
+                      size: 15,
+                      weight: FontWeight.w100,
+                    ),
+                    SizedBox(
+                      width: 150.w,
+                    ),
+                  ],
+                ),
+                Divider(),
+                for(int i=0;i<controller.employeeListModel.length;i++)
                   Row(
-                    children: [
-                      CustomText(
-                        text: "Sr No.",
-                        size: 15,
-                        weight: FontWeight.w100,
-                      ),
-                      SizedBox(
-                        width: 50.w,
-                      ),
-                      CustomText(
-                        text: "Employee Name",
-                        size: 15,
-                        weight: FontWeight.w100,
-                      ),
-                      SizedBox(
-                        width: 50.w,
-                      ),
-                      CustomText(
-                        text: "Gender",
-                        size: 15,
-                        weight: FontWeight.w100,
-                      ),
-                      SizedBox(
-                        width: 50.w,
-                      ),
-                      CustomText(
-                        text: "Address",
-                        size: 15,
-                        weight: FontWeight.w100,
-                      ),
-                      SizedBox(
-                        width: 150.w,
-                      ),
-                    ],
-                  ),
-                  Divider(),
-                  for(int i=0;i<controller.employeeListModel.length;i++)
-                    Row(
                       children: [
                         SizedBox(
                           width:40.w,
@@ -167,16 +175,76 @@ class AddOffice extends GetView<SettingController> {
                                 Image.asset('assets/Cancel.png',width: 50.w,height: 50.h,)
                                     :Image.asset('assets/Add.png',width: 50.w,height: 50.h,)),
                         )
-          ]
-                    )
+                      ]
+                  )
 
-                ],
-              ),
+              ],
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
+  }
+  Set<Marker> markers = {};
+  LatLng initialPosition = LatLng(19.206924751547263, 72.97582665488119); // Example coordinates (Googleplex)
+  late GoogleMapController mapController;
+
+  void _onMapTapped(LatLng latLng) async {
+    print("Map tapped at: ${latLng.latitude}, ${latLng.longitude}");
+
+    try {
+      var request = http.Request('GET', Uri.parse('https://vr-safetrips.onrender.com/api/direction/geocode?latitude=${latLng.latitude}&longitude=${latLng.longitude}'));
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+      });
+
+      http.StreamedResponse response = await request.send();
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+        String address = await response.stream.bytesToString();
+        print("Response: $address");
+
+        if (address.isNotEmpty) {
+          Map<String, dynamic> jsonResponse = jsonDecode(address);
+
+          if (jsonResponse["success"] == true && jsonResponse["data"] != null) {
+            List<dynamic> data = jsonResponse["data"];
+
+            if (data.isNotEmpty) {
+              String location = data[0]["formatted_address"]; // Access formatted_address
+              print("Location: $location");
+              controller.office.value.address = location;
+              controller.office.value.latitude = latLng.latitude;
+              controller.office.value.longitude = latLng.longitude;
+
+              setState(() {
+                markers.clear();
+                markers.add(Marker(
+                  markerId: MarkerId(latLng.toString()),
+                  position: latLng,
+                  infoWindow: InfoWindow(title: location), // Show address on marker
+                ));
+              });
+            } else {
+              print("No data found");
+            }
+          } else {
+            print("API Success false or Empty Data");
+          }
+        } else {
+          print("Empty Address Response");
+        }
+      } else {
+        print("Failed with status: ${response.statusCode}");
+      }
+
+    } catch (e) {
+      print("Geocoding Error: $e");
     }
+  }
+  @override
+  Widget build(BuildContext context) {
     return ResponsiveWidget(largeScreen: SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Column(
@@ -249,11 +317,13 @@ class AddOffice extends GetView<SettingController> {
                                     borderRadius: BorderRadius.circular(20.r),
                                     border: Border.all(color: dark),
                                   ),
-                                    child: Center(
+                                    child:
+                                     const Center(
                                       child: CustomText(
                                           text: 'Assign Supervisor',
                                       ),
-                                    )
+
+                                    ),
                                 )
 
                             ),
@@ -303,29 +373,26 @@ class AddOffice extends GetView<SettingController> {
                             ),
                           ],
                         ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top :25.0),
-                            child: InkWell(
-                              onTap: (){
-                                // controller.gotolocation(context);
-                              },
-                              child: Container(
-                                width:200.w,
-                                decoration: BoxDecoration(color: active,
-                                    borderRadius: BorderRadius.circular(10)),
-                                alignment: Alignment.center,
-                                constraints:  const BoxConstraints(
-                                  maxWidth:150,
-                                ),
-                                height: 40,
-                                child:  const CustomText(
-                                  text: "Map",
-                                  color: Colors.white,
-                                ),
+                        SizedBox(
+                            width: 400.w,
+                            height:400.h,
+                            child: GoogleMap(
+                              mapType: MapType.normal,
+                              myLocationEnabled: true,
+                              zoomGesturesEnabled: true,
+                              zoomControlsEnabled: true,
+                              markers: markers, // Set of markers on the map
+                              initialCameraPosition: CameraPosition(
+                                target: initialPosition,
+                                zoom: 14.0, // Zoom level
                               ),
-                            ),
-                          ),
+                              onMapCreated: (GoogleMapController controller) {
+                                mapController=controller;
+                              },
+                              onTap: (LatLng latLng) {
+                                _onMapTapped(latLng);
+                              },
+                            )
                         ),
                       ],
                     ),
@@ -335,7 +402,43 @@ class AddOffice extends GetView<SettingController> {
                   ),
                   InkWell(
                     onTap: () async {
-                      await controller.addOffice();
+                      if(controller.selectedSupervisorId == false){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: CustomText(
+                                text: 'Please select Supervisor',
+                                color: Colors.white,
+                              ),
+                              backgroundColor: Colors.red,
+                            ));
+                        return;
+                      }
+                      if(controller.office.value.name == null || controller.office.value.name == ""){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: CustomText(
+                                text: 'Please enter Office Name',
+                                color: Colors.white,
+                              ),
+                              backgroundColor: Colors.red,
+                            ));
+                        return;
+                      }
+                      if(controller.office.value.address == null || controller.office.value.address == ""){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+
+                              content: CustomText(
+                                text: 'Please enter Address',
+                                color: Colors.white,
+                              ),
+                              backgroundColor: Colors.red,
+                            ));
+                        return;
+                      }
+                      await controller.addOffice(
+                          context
+                      );
                       controller.getAllOffice();
                     },
                     child: Container(
@@ -374,7 +477,7 @@ class AddOffice extends GetView<SettingController> {
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 40,
                   ),
 
                 ],

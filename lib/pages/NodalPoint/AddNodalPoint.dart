@@ -10,7 +10,8 @@ import '../../constants/style.dart';
 import '../../widgets/InputField.dart';
 import '../../widgets/custom_text.dart';
 import 'NodalPointController/NodalPointController.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddNodalPoint extends StatefulWidget {
   const AddNodalPoint({super.key});
@@ -41,39 +42,57 @@ class _AddNodalPointState extends State<AddNodalPoint> {
     setState(() {}); // Update the UI with the new marker
   }
   void _onMapTapped(LatLng latLng) async {
-    print("Map tapped at: ${latLng.latitude}, ${latLng.longitude}"); // Debug line
-    if (latLng == null) {
-      print("Received null coordinates!"); // Debug line
-      return;
-    }
+    print("Map tapped at: ${latLng.latitude}, ${latLng.longitude}");
 
-    // Proceed with reverse geocoding and adding markers
     try {
-      List<Placemark> placemarks = [];
-      try {
-        List<Placemark> placemarks = await placemarkFromCoordinates(52.2165157, 6.9437819);
-      } catch (e) {
-        print("Error during placemark: $e");
-      }
-      if (placemarks.isNotEmpty) {
-        print("Placemark found: ${placemarks[0]}"); // Debug line
-        Placemark place = placemarks[0];
-        String address = "${place.name}, ${place.locality}, ${place.country}";
-        print("Address: $address");
+      var request = http.Request('GET', Uri.parse('https://vr-safetrips.onrender.com/api/direction/geocode?latitude=${latLng.latitude}&longitude=${latLng.longitude}'));
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+      });
 
-        setState(() {
-          markers.clear();
-          markers.add(Marker(
-            markerId: MarkerId(latLng.toString()),
-            position: latLng,
-            infoWindow: InfoWindow(title: address),
-          ));
-        });
+      http.StreamedResponse response = await request.send();
+        print(response.statusCode);
+
+        if (response.statusCode == 200) {
+        String address = await response.stream.bytesToString();
+        print("Response: $address");
+
+        if (address.isNotEmpty) {
+          Map<String, dynamic> jsonResponse = jsonDecode(address);
+
+          if (jsonResponse["success"] == true && jsonResponse["data"] != null) {
+            List<dynamic> data = jsonResponse["data"];
+
+            if (data.isNotEmpty) {
+              String location = data[0]["formatted_address"]; // Access formatted_address
+              print("Location: $location");
+              controller.address.value = location;
+              controller.latitude.value = latLng.latitude.toString();
+              controller.longitude.value = latLng.longitude.toString();
+
+              setState(() {
+                markers.clear();
+                markers.add(Marker(
+                  markerId: MarkerId(latLng.toString()),
+                  position: latLng,
+                  infoWindow: InfoWindow(title: location), // Show address on marker
+                ));
+              });
+            } else {
+              print("No data found");
+            }
+          } else {
+            print("API Success false or Empty Data");
+          }
+        } else {
+          print("Empty Address Response");
+        }
       } else {
-        print("No address found for the tapped location.");
+        print("Failed with status: ${response.statusCode}");
       }
+
     } catch (e) {
-      print("Error during geocoding: $e");
+      print("Geocoding Error: $e");
     }
   }
 
@@ -86,92 +105,174 @@ class _AddNodalPointState extends State<AddNodalPoint> {
       for (var set in officeList) set.first: set.last
     };
     List<String> officeListMap = officeMap.keys.toList();
-    return ResponsiveWidget(largeScreen: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Obx(() => Row(
-            children: [
-              Container(
-                  margin: EdgeInsets.only(top: ResponsiveWidget.isSmallScreen(context) ? 56 : 13),
-                  child: CustomText(
-                    text: menuController.activeItem.value,
-                    size: 24,
-                    weight: FontWeight.bold,
-                    color: dark,
-                  )),
-            ],
-          ),
-          ),
-          const SizedBox(
-            height: 35,
-          ),
-          Row(
-            children: [
-              CustomText(
-                  text: 'Add Nodal Point',
-                  color: dark,size:ResponsiveWidget.isSmallScreen(context) ?80.sp:20.sp),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: InkWell(
-                    onTap: (){
-                     Navigator.pop(context);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(color: active,
-                          borderRadius: BorderRadius.circular(10)),
-                      alignment: Alignment.center,
-                      constraints:  const BoxConstraints(
-                        maxWidth:130,
-                      ),
-                      height: 40,
-                      child:  const CustomText(
-                        text: "Back",
-                        color: Colors.white,
+    return ResponsiveWidget(largeScreen: SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Obx(() => Row(
+              children: [
+                Container(
+                    margin: EdgeInsets.only(top: ResponsiveWidget.isSmallScreen(context) ? 56 : 13),
+                    child: CustomText(
+                      text: menuController.activeItem.value,
+                      size: 24,
+                      weight: FontWeight.bold,
+                      color: dark,
+                    )),
+              ],
+            ),
+            ),
+            const SizedBox(
+              height: 35,
+            ),
+            Row(
+              children: [
+                CustomText(
+                    text: 'Add Nodal Point',
+                    color: dark,size:ResponsiveWidget.isSmallScreen(context) ?80.sp:20.sp),
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: InkWell(
+                      onTap: (){
+                       Navigator.pop(context);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(color: active,
+                            borderRadius: BorderRadius.circular(10)),
+                        alignment: Alignment.center,
+                        constraints:  const BoxConstraints(
+                          maxWidth:130,
+                        ),
+                        height: 40,
+                        child:  const CustomText(
+                          text: "Back",
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  SizedBox(
-                    width: 700.w,
-                    height:0.75.sh,
-                    child: GoogleMap(
-                      mapType: MapType.normal,
-                      myLocationEnabled: true,
-                      zoomGesturesEnabled: true,
-                      zoomControlsEnabled: true,
-                      markers: markers, // Set of markers on the map
-                      initialCameraPosition: CameraPosition(
-                        target: initialPosition,
-                        zoom: 14.0, // Zoom level
-                      ),
-                      onMapCreated: (GoogleMapController controller) {
-                        mapController = controller;
-                      },
-                      onTap: (LatLng latLng) {
-                        print("Tapped on map at: ${latLng.latitude}, ${latLng.longitude}");
-                        if (latLng != null) {
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                    SizedBox(
+                      width: 600.w,
+                      height:0.75.sh,
+                      child: GoogleMap(
+                        mapType: MapType.normal,
+                        myLocationEnabled: true,
+                        zoomGesturesEnabled: true,
+                        zoomControlsEnabled: true,
+                        markers: markers, // Set of markers on the map
+                        initialCameraPosition: CameraPosition(
+                          target: initialPosition,
+                          zoom: 14.0, // Zoom level
+                        ),
+                        onMapCreated: (GoogleMapController controller) {
+                          mapController = controller;
+                        },
+                        onTap: (LatLng latLng) {
                           _onMapTapped(latLng);
-                        } else {
-                          print("Error: Tapped coordinates are null");
-                        }
-                      },
-                    )
+                        },
+                      )
+                    ),
+                    Column(
+                  children: [
+                    Container(
+                      width: 500.w,
+                      decoration: BoxDecoration(
+                        color: light,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 20.w),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 20.h,),
+                            CustomText(text: "Selected Nodal Point",
+                              color: Colors.black,
+                              size: 20.sp,),
+                            SizedBox(height: 15.h,),
+                            Obx(()=>
+                                CustomText(text: "name: ${controller.nodalPointName}"),
+                            ),
+                            SizedBox(height: 10.h,),
+                            Obx(()=>
+                                CustomText(text: "address: ${controller.address}"),
+                            ),
+                            SizedBox(height: 5.h,),
+                            Row(
+                              children: [
+                                Obx(()=>
+                                    CustomText(text: "lat: ${controller.latitude}"),
+                                ),
+                                SizedBox(width: 20.w,),
+                                Obx(()=>
+                                    CustomText(text: "long: ${controller.longitude}"),
+                                ),
+                              ],
+                            ),
+                                Obx(()=>
+                                Padding(padding: EdgeInsets.only(top: 10.h),
+                                  child: DropDown(
+                                    fontsize: 15,
+                                    context: context,
+                                    title: "Select Office",
+                                    items: officeListMap,
+                                    onChanged: (value) {
+                                      controller.officeId.value = officeMap[value]!;
+                                      controller.officeName.value = value!;
+                                    },
+                                    selectedItem: controller.officeName.value==''?'Select Office':controller.officeName.value,
+                                  ),
+                                )
+                                ),
+                            SizedBox(height: 10.h,),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
 
-                  ),
-                  Positioned(
-                    bottom: 20,
-                    child: Column(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                    child: InkWell(
+                                      onTap: ()  {
+                                        controller.createNodal();
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(color: active,
+                                            borderRadius: BorderRadius.circular(10)),
+                                        alignment: Alignment.center,
+                                        constraints:  const BoxConstraints(
+                                          maxWidth:130,
+                                        ),
+                                        height: 35,
+                                        child:  const CustomText(
+                                          text: "Confirm",
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                    ]),
+                    Column(
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -254,101 +355,9 @@ class _AddNodalPointState extends State<AddNodalPoint> {
                         )
                       ],
                     ),
-                  )
-                ],
-              ),
-              Column(
-                children: [
-                  Container(
-                    width: 450.w,
-                    decoration: BoxDecoration(
-                      color: light,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Padding(
-                      padding:  EdgeInsets.symmetric(horizontal: 20.w),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 20.h,),
-                          CustomText(text: "Selected Nodal Point",
-                            color: Colors.black,
-                            size: 20.sp,),
-                          SizedBox(height: 15.h,),
-                          Obx(()=>
-                              CustomText(text: "name: ${controller.nodalPointName}"),
-                          ),
-                          SizedBox(height: 10.h,),
-                          Obx(()=>
-                              CustomText(text: "address: ${controller.address}"),
-                          ),
-                          SizedBox(height: 5.h,),
-                          Row(
-                            children: [
-                              Obx(()=>
-                                  CustomText(text: "lat: ${controller.latitude}"),
-                              ),
-                              SizedBox(width: 20.w,),
-                              Obx(()=>
-                                  CustomText(text: "long: ${controller.longitude}"),
-                              ),
-                            ],
-                          ),
-                              Obx(()=>
-                              Padding(padding: EdgeInsets.only(top: 10.h),
-                                child: DropDown(
-                                  fontsize: 15,
-                                  context: context,
-                                  title: "Select Office",
-                                  items: officeListMap,
-                                  onChanged: (value) {
-                                    controller.officeId.value = officeMap[value]!;
-                                    controller.officeName.value = value!;
-                                  },
-                                  selectedItem: controller.officeName.value==''?'Select Office':controller.officeName.value,
-                                ),
-                              )
-                              ),
-                          SizedBox(height: 10.h,),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(
-                                  child: InkWell(
-                                    onTap: ()  {
-                                      controller.createNodal();
-                                      Navigator.pop(context);
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(color: active,
-                                          borderRadius: BorderRadius.circular(10)),
-                                      alignment: Alignment.center,
-                                      constraints:  const BoxConstraints(
-                                        maxWidth:130,
-                                      ),
-                                      height: 35,
-                                      child:  const CustomText(
-                                        text: "Confirm",
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                  ]),
-                ],
-              ),],),])
+                  ],
+                ),],),]),
+    )
     );
   }
 }

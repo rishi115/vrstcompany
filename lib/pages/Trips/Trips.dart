@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vrsstranslinkcompany/constants/controllers.dart';
 import 'package:vrsstranslinkcompany/constants/style.dart';
+import 'package:vrsstranslinkcompany/pages/Trips/DetailedTrip.dart';
 import 'package:vrsstranslinkcompany/pages/Trips/TripController/TripController.dart';
 import 'package:vrsstranslinkcompany/widgets/Button.dart';
 import 'package:vrsstranslinkcompany/widgets/custom_text.dart';
@@ -193,78 +194,6 @@ class TripsScreen extends GetView<TripController> {
       ),
     );
   }
-  final List<Map<String, dynamic>> trips = [
-    {
-      "tripName": "Morning Trip A",
-      "tripDetails": {
-        "tripId": "T0897989879789870",
-        "date": "2024-12-25",
-        "isGuard": true,
-        "employeeCapacity": 3,
-        "approxStartTime": "07:00 AM",
-        "realStartTime": "07:10 AM",
-        "approxEndTime": "09:00 AM",
-        "realEndTime": "09:05 AM",
-        "tripType": "One-way",
-        "driverName": "David Williams",
-        "vehicleNumber": "ABC1234",
-        "ota": "08:00 AM",
-        "otd": "08:15 AM",
-      },
-      "employees": [
-        {
-          "employeeId": "E87990",
-          "name": "John  Doe",
-          "phone": "1234567890",
-          "nodalName": "kalyan mumbai india ",
-          "otp": "1234",
-          "pickupTime": "08:00 AM",
-          "approxPickupTime": "07:50 AM",
-          "status": "On Time"
-        },
-        {
-          "employeeId": "E002",
-          "name": "Jane Smith",
-          "phone": "0987654321",
-          "nodalName": "Node B",
-          "otp": "5678",
-          "pickupTime": "08:30 AM",
-          "approxPickupTime": "08:20 AM",
-          "status": "Delayed"
-        },
-      ]
-    },
-    {
-      "tripName": "Evening Trip B",
-      "tripDetails": {
-        "tripId": "T002",
-        "date": "2024-12-25",
-        "isGuard": false,
-        "employeeCapacity": 2,
-        "approxStartTime": "05:00 PM",
-        "realStartTime": "05:10 PM",
-        "approxEndTime": "07:00 PM",
-        "realEndTime": "07:05 PM",
-        "tripType": "Round-trip",
-        "driverName": "Alice Brown",
-        "vehicleNumber": "XYZ5678",
-        "ota": "06:00 PM",
-        "otd": "06:10 PM",
-      },
-      "employees": [
-        {
-          "employeeId": "E003",
-          "name": "Alice Brown",
-          "phone": "1112223333",
-          "nodalName": "Node C",
-          "otp": "9101",
-          "pickupTime": "06:00 PM",
-          "approxPickupTime": "05:50 PM",
-          "status": "On Time"
-        }
-      ]
-    },
-  ];
   Widget buildTripDetailRow(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -273,87 +202,6 @@ class TripsScreen extends GetView<TripController> {
           Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
           SizedBox(width: 8),
           Text(value),
-        ],
-      ),
-    );
-  }
-  openContainer(
-      {required Map<String, dynamic> trip}
-      ){
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment:  MainAxisAlignment.start,
-                children: [
-                  Text("Employees", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text("Employee ID")),
-                        DataColumn(label: Text("Name")),
-                        DataColumn(label: Text("Phone")),
-                        DataColumn(label: Text("Node")),
-                        DataColumn(label: Text("Pickup Time")),
-                        DataColumn(label: Text("Approx Time")),
-                        DataColumn(label: Text("Status")),
-                      ],
-                      rows: trip["employees"].map<DataRow>((employee) {
-                        return DataRow(cells: [
-                          DataCell(Text(employee["employeeId"])),
-                          DataCell(Text(employee["name"])),
-                          DataCell(Text(employee["phone"])),
-                          DataCell(Text(employee["nodalName"])),
-                          DataCell(Text(employee["pickupTime"])),
-                          DataCell(Text(employee["approxPickupTime"])),
-                          DataCell(Text(employee["status"])),
-                        ]);
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(width: 16),
-          // Trip Details on the right
-          Container(
-            width: 250,
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.blueAccent.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.blueAccent),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Trip Details", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 8),
-                buildTripDetailRow("Trip ID", trip["tripDetails"]["tripId"]),
-                buildTripDetailRow("Date", trip["tripDetails"]["date"]),
-                buildTripDetailRow("Is Guard", trip["tripDetails"]["isGuard"].toString()),
-                buildTripDetailRow("Capacity", trip["tripDetails"]["employeeCapacity"].toString()),
-                buildTripDetailRow("Approx Start Time", trip["tripDetails"]["approxStartTime"]),
-                buildTripDetailRow("Real Start Time", trip["tripDetails"]["realStartTime"]),
-                buildTripDetailRow("Approx End Time", trip["tripDetails"]["approxEndTime"]),
-                buildTripDetailRow("Real End Time", trip["tripDetails"]["realEndTime"]),
-                buildTripDetailRow("Trip Type", trip["tripDetails"]["tripType"]),
-                buildTripDetailRow("Driver Name", trip["tripDetails"]["driverName"]),
-                buildTripDetailRow("Vehicle No.", trip["tripDetails"]["vehicleNumber"]),
-                buildTripDetailRow("OTA", trip["tripDetails"]["ota"]),
-                buildTripDetailRow("OTD", trip["tripDetails"]["otd"]),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -525,8 +373,20 @@ class TripsScreen extends GetView<TripController> {
                         return Column(
                           children: [
                             InkWell(
-                              onTap: () {
-                                controller.toggleContainer(index);  // Toggle the container visibility
+                              onTap: () async {
+                               await  controller.routeFromCompany(
+                                    controller.tripList[index].providedRoute!,
+                                    controller.officeLatlong.latitude,
+                                    controller.officeLatlong.longitude
+                                );
+                               Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => detailedTrip(
+                                      trip: controller.tripList[index],
+                                    ),
+                                  ),
+                                );
                               },
                               child: Container(
                                 margin: const EdgeInsets.only(bottom: 8.0),
@@ -539,16 +399,14 @@ class TripsScreen extends GetView<TripController> {
                                   vehicleModel: controller.tripList[index].vehicleNumber ?? "",
                                   startTime: controller.tripList[index].approxStartTime ?? "",
                                   endTime: controller.tripList[index].approxEndTime ?? "",
-                                  profile: controller.tripList[index].listOfEmployees.length.toString(),
+                                  profile: controller.tripList[index].listOfEmployees!.length.toString(),
                                   status: controller.tripList[index].status ?? "",
-                                  employee: controller.tripList[index].listOfEmployees.isNotEmpty
-                                      ? controller.tripList[index].listOfEmployees.first.employeeName ?? ""
+                                  employee: controller.tripList[index].listOfEmployees!.isNotEmpty
+                                      ? controller.tripList[index].listOfEmployees!.first.employeeName ?? ""
                                       : "No Employee",
                                 ),
                               ),
                             ),
-                            if (controller.openContainer.contains(index))
-                              openContainer(trip: controller.tripList[index].toJson())
                           ],
                         );
                       },

@@ -26,6 +26,7 @@ class Employee {
    String? locality;
    String? latitude;
    String? longitude;
+   String? nodalPoint;
 
   Employee({
     this.firstName,

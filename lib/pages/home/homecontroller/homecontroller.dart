@@ -1,10 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:vrsstranslinkcompany/Services/HomeService.dart';
 import 'package:vrsstranslinkcompany/Services/SettingsService.dart';
 
 import '../../../Model/HomeModel.dart';
+import '../../../Model/OfficeModel.dart';
 import '../../../Model/ShiftModel.dart';
+import '../../Setting/AddOffice.dart';
 
 class HomeController extends GetxController {
   var shiftList = <ShiftModel>[].obs;
@@ -22,6 +26,13 @@ class HomeController extends GetxController {
   var selectedShiftId = ''.obs;
   var selectedTripType = ''.obs;
   var VendorDistribution = VendorDistributionModel().obs;
+  var officeList = <OfficeModel>[
+    OfficeModel(
+      id: '1',
+      name: 'VRSSTranslink',
+      address: 'Kathmandu, Nepal',
+    )
+  ].obs;
 
   getShiftList() async {
     isLoading.value = true;
@@ -76,6 +87,7 @@ class HomeController extends GetxController {
     vendorDistributionLoading.value = true;
 
     await Future.wait([
+      settingsService.getAllOffice(),
       settingsService.getAllShift(),
       homeService.getTripCount(
         shiftId: selectedShiftId.value,
@@ -85,7 +97,8 @@ class HomeController extends GetxController {
       homeService.getTodayTripData(),
         homeService.getVendorDistribution(selectedShiftId.value),
     ]).then((value) {
-      shiftList.value = value[0] as List<ShiftModel>;
+      officeList.value = value[0] as List<OfficeModel>;
+      shiftList.value = value[1] as List<ShiftModel>;
       DateTime currentDate = DateTime.now();
       String formattedDate = DateFormat('MMMM dd, yyyy').format(currentDate);
 
@@ -141,11 +154,11 @@ class HomeController extends GetxController {
 
 
       isLoading.value = false;
-      tripAnalytics.value = value[1] as TripAnalytics;
+      tripAnalytics.value = value[2] as TripAnalytics;
       tripAnalyticsLoading.value = false;
-      todayTripList.value = value[2] as List<TripData>;
+      todayTripList.value = value[3] as List<TripData>;
       tripLoading.value = false;
-      VendorDistribution.value = value[3] as VendorDistributionModel;
+      VendorDistribution.value = value[4] as VendorDistributionModel;
       vendorDistributionLoading.value = false;
 
     });

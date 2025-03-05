@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:vrsstranslinkcompany/pages/Setting/AddGuard.dart';
@@ -114,9 +115,10 @@ class Settings extends GetView<SettingController> {
               ),
               TextButton(
                 child: Text('OK'),
-                onPressed: () {
-                  controller.createShift();
-                  Navigator.of(context).pop();
+                onPressed: () async {
+                  await controller.createShift();
+                   Navigator.of(context).pop();
+                  controller.getAllShift();
                 },
               ),
             ],
@@ -378,6 +380,7 @@ class Settings extends GetView<SettingController> {
             ],
           ),
           ),
+          Obx(()=>
           Container(
             height:100.h,
             width: double.infinity,
@@ -425,8 +428,8 @@ class Settings extends GetView<SettingController> {
                       SizedBox(
                         height: 5.h,
                       ),
-                      const CustomText(
-                        text: "100",
+                       CustomText(
+                        text: controller.agencyList.length.toString(),
                         weight: FontWeight.bold,
                       ),
                     ],
@@ -448,7 +451,7 @@ class Settings extends GetView<SettingController> {
                       ),
                       Container(
                           child: CustomText(
-                            text: "100",
+                            text: controller.supervisorList.length.toString(),
                             weight: FontWeight.bold,
                           )
                       ),
@@ -471,7 +474,7 @@ class Settings extends GetView<SettingController> {
                       ),
                       Container(
                           child: CustomText(
-                            text: "100",
+                            text: controller.officesList.length.toString(),
                             weight: FontWeight.bold,
                           )
                       ),
@@ -488,7 +491,7 @@ class Settings extends GetView<SettingController> {
                 ),
               ],
             ),
-          ),
+          )),
           SizedBox(
             height: 20.h,
           ),
@@ -856,7 +859,7 @@ class Settings extends GetView<SettingController> {
                                   width:70.w,
                                 ),
                                 SizedBox(
-                                  width:300.w,
+                                  width:270.w,
                                   child: Center(
                                     child: CustomText(
                                         text: 'Samrat Nagar, majiwada niwas, Gandhi park pune east',
@@ -923,8 +926,7 @@ class Settings extends GetView<SettingController> {
                           () => DataTable(
                         columnSpacing: 50,
                         horizontalMargin: 10,
-
-                        columns: const [
+                            columns: const [
                           DataColumn(
                             label: Text("Office Name",
                                 style: TextStyle(fontWeight: FontWeight.bold)),
@@ -945,6 +947,7 @@ class Settings extends GetView<SettingController> {
                         rows: List.generate(
                           controller.officesList.length,
                               (index) => DataRow(
+
                             cells: [
                               DataCell(
                                 Text(controller.officesList[index].name ?? "Office name"),
@@ -954,7 +957,11 @@ class Settings extends GetView<SettingController> {
                                     "Supervisor Id"),
                               ),
                               DataCell(
-                                Text(controller.officesList[index].address ?? "Address"),
+                                SizedBox(
+                                  width: 600.w,
+                                  child: Text(
+                                      controller.officesList[index].address ?? "Address"),
+                                ),
                               ),
                               DataCell(
                                 Row(

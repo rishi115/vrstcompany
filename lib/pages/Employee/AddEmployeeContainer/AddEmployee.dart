@@ -65,16 +65,17 @@ class AddEmployeePage extends GetView<EmployeeController> {
             ),
           ],
         )
-            :ResponsiveWidget.isMediumScreen(context)?Row(
-          children: [
-            CustomText(
+            :ResponsiveWidget.isMediumScreen(context)
+            ? Row(
+                children: [
+                CustomText(
                 text: 'EMPLOYEE REGISTRATION FORM',
                 color: light,size:ResponsiveWidget.isSmallScreen(context) ?80.sp:24.sp),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: InkWell(
+                const Spacer(),
+                Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                 child: InkWell(
                   onTap: (){
                     controller.addEmployeeInbulk(context);
                   },
@@ -94,9 +95,9 @@ class AddEmployeePage extends GetView<EmployeeController> {
                 ),
               ),
             ),
-          ],
-        ):
-            Column(
+             ],
+           )
+            : Column(
               children: [ CustomText(
                   text: 'EMPLOYEE REGISTRATION FORM',
                   color: light,size:ResponsiveWidget.isSmallScreen(context) ?80.sp:24.sp),
@@ -123,12 +124,11 @@ class AddEmployeePage extends GetView<EmployeeController> {
                     ),
                   ),
                 ),],
-            )
-        ,
-        SizedBox(
+            ),
+              SizedBox(
           height: 20.h,
         ),
-        Expanded(
+              Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(
@@ -154,7 +154,9 @@ class AddEmployeePage extends GetView<EmployeeController> {
                       child: Center(
                         child: InkWell(
                           onTap: (){
-                            controller.registerEmployee();
+                            controller.registerEmployee(
+                                context
+                            );
                           },
                           child: Container(
                             decoration: BoxDecoration(color: active,
@@ -180,6 +182,26 @@ class AddEmployeePage extends GetView<EmployeeController> {
                       child: Center(
                         child: InkWell(
                           onTap: (){
+                            controller.employee.value.firstName = '';
+                            controller.employee.value.middleName = '';
+                            controller.employee.value.lastName = '';
+                            controller.employee.value.contactNumber = '';
+                            controller.employee.value.secondaryContactNumber = '';
+                            controller.employee.value.employeeId = '';
+                            controller.employee.value.secondaryId = '';
+                            controller.employee.value.dateOfBirth = '';
+                            controller.employee.value.email = '';
+                            controller.employee.value.joiningDate = '';
+                            controller.employee.value.supervisorName = '';
+                            controller.employee.value.isSupervisor = false;
+                            controller.employee.value.transportInactiveDate = '';
+                            controller.employee.value.rfid = '';
+                            controller.employee.value.address = '';
+                            controller.employee.value.locality = '';
+                            controller.employee.value.latitude = '';
+                            controller.employee.value.longitude = '';
+                            controller.employee.value.age = '';
+                            controller.employee.value.disability = '';
                             Navigator.pop(context);
                           },
                           child: Container(

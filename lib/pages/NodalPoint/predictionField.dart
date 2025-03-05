@@ -112,7 +112,7 @@ class _AddressFieldState extends State<AddressField> {
         if (predictions.isNotEmpty)
           Container(
             color: Colors.white,
-            height: 300.h,
+            height: 270.h,
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Column(children: List.generate(predictions.length, (index) {
