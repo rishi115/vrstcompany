@@ -93,7 +93,7 @@ class Helpdesk extends GetView<HelpdeskController> {
                   ),
                   height: 50,
                   child:  const CustomText(
-                    text: "+ Register New Employee",
+                    text: "+ Register New Enquiry",
                     color: Colors.white,
                   ),
                 ),
@@ -296,11 +296,26 @@ class Helpdesk extends GetView<HelpdeskController> {
         //    ) ),
         //  )
         //  ),
-        IssuesTable(),
+
+          Obx(()=>
+        Column(
+          children: [
+            controller.isLoading.value
+                ? Center(
+              child: CircularProgressIndicator(),
+            )
+                : controller.helpDeskList.isEmpty?
+            Center(child: Image.asset("assets/empty.png",height: 400.h,width: 400.w,))
+                :IssuesTable(),
+          ],
+        )),
+
       ],
     );
   }
 }
+
+
 class IssuesTable extends GetView<HelpdeskController> {
   @override
   Widget build(BuildContext context) {

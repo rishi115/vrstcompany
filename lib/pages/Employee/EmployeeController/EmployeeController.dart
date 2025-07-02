@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:vrsstranslinkcompany/Model/EmployeeDetailsModel.dart';
 import 'package:vrsstranslinkcompany/Model/EmployeeListModel.dart';
 import 'package:vrsstranslinkcompany/Services/EmployeeService.dart';
@@ -34,10 +35,46 @@ class EmployeeController extends GetxController{
   var officeName = ''.obs;
   var statusFilterList=<String>["active","inactive"].obs;
   var selectedStatus = ''.obs;
+  var nodalPointId=''.obs;
+  var latitude = ''.obs;
+  var longitude = ''.obs;
 
 
+  Future<void> getLatLngFromAddress(String address) async {
+    print('Address: $address');
+    const String apiKey = 'AIzaSyCE-07OqyB1ze3XgMCta9qH95p4bhENiLg'; // Replace with your API key
 
+    final Dio dio = Dio();
+    final String url =
+        'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$apiKey';
 
+    try {
+      final response = await dio.get(url);
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        if (data['status'] == 'OK') {
+          final location = data['results'][0]['geometry']['location'];
+          final double Latitude = location['lat'];
+          final double Longitude = location['lng'];
+          latitude.value = Latitude.toString();
+          employee.value.latitude = Latitude.toString();
+          employee.value.longitude = longitude.toString();
+          longitude.value = Longitude.toString();
+        } else {
+          print('Error: ${data['status']}');
+          return null;
+        }
+      } else {
+        print('Failed to get response from API');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
   Future<void> SelectDate(BuildContext context,RxString datepicked) async {
     final DateTime currentDate = DateTime.now();
     final DateTime? picked = await showDatePicker(
@@ -87,7 +124,8 @@ class EmployeeController extends GetxController{
 
 
   _employeeService.registerEmployee(employee.value,
-      TransportInactiveday.value,DateofBirth.value,context,DateofJoining.value
+      TransportInactiveday.value,DateofBirth.value,context,nodalPointId.value
+    ,DateofJoining.value,
   );
   }
 

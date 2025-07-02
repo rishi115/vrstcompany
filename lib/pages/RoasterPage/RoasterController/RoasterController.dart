@@ -70,31 +70,37 @@ class RoasterController extends GetxController{
   var expandedList = [].obs;
   int? lastCutIndex;
   var cutEmployees = [].obs;
+  var shiftTime = <String>[].obs;
   var ApproveVendor = <String>[].obs;
   RxBool isApproveVendor = false.obs;
   RxList<Routes> routes = <Routes>[].obs;
   var vendorList = <VendorModelById>[].obs;
   var cutEmployee = Rxn<Employees>(); // Rxn allows nullable reactive variables
   RxList<Routes> modifiedRoutes = <Routes>[].obs;
+  var officeLocation = Rx<LatLng>(const LatLng(19.2183, 72.9781)); // Default office location
+  var isSelectedVehicle = <String>[].obs;
+  var selectedVehicleCapacity = 0.obs;
+  var roasterTotal = 0.obs;
+  var isSplitRoute = false.obs;
+  var employeeSplit = <Employees>[].obs;
+  var employeeSplitId = <String>[].obs;
+  var routeSplit = Rxn<Routes>();
 
-  // var routes = <Route>[].obs;
-  isLocked(
-      String routeId,
-      ){
-
-
-  }
-
-
-  bool canSelectRoute(bool isAssignedRoute) {
-
-    isApproveVendor.value = isAssignedRoute;
+  bool canSelectRoute(bool isAssignedRoute)  {
     return ApproveVendor.isEmpty ||
         ApproveVendor.every((id) =>
-        Rxroasters.value.routes?.firstWhere((r) => r.id == id).vehicleAssignedByVendor ==
-            isAssignedRoute);
+        Rxroasters.value.routes
+            ?.firstWhere((r) => r.id == id)
+            .vehicleAssignedByVendor == isAssignedRoute);
   }
   Future<void> cutEmployeeFromRoute(int routeIndex, int employeeIndex) async {
+    if(isSplitRoute.value == true) {
+      Get.snackbar(
+        'Split Route',
+        'Please complete the split route operation first'
+      );
+      return; // Prevent cutting an employee if in split route mode
+    }
     if (cutEmployee.value != null) {
       Get.snackbar(
         'Employee already cut',
@@ -102,6 +108,7 @@ class RoasterController extends GetxController{
       );
       return; // Prevent cutting another employee
     }
+
 
     var employees = routes[routeIndex].employees!;
     if (employeeIndex >= 0 && employeeIndex < employees.length) {
@@ -118,6 +125,13 @@ class RoasterController extends GetxController{
     }
   }
   Future<void> deleteEmployeeFromRoute(int routeIndex, int employeeIndex) async {
+    if(isSplitRoute.value == true) {
+      Get.snackbar(
+          'Split Route',
+          'Please complete the split route operation first'
+      );
+      return; // Prevent cutting an employee if in split route mode
+    }
     var employees = routes[routeIndex].employees!;
     if (employeeIndex >= 0 && employeeIndex < employees.length) {
       employees.removeAt(employeeIndex);
@@ -131,6 +145,13 @@ class RoasterController extends GetxController{
     }
   }
   void resetCutEmployee() {
+    if(isSplitRoute.value == true) {
+      Get.snackbar(
+          'Split Route',
+          'Please complete the split route operation first'
+      );
+      return; // Prevent cutting an employee if in split route mode
+    }
     if (cutEmployee.value != null) {
       Get.snackbar(" Employee Reset", "Employee has been reset");
       cutEmployee.value = null; // Clear the cut employee
@@ -151,16 +172,23 @@ class RoasterController extends GetxController{
 
 
   Future<void> pasteEmployeeToRoute(int routeIndex, int position) async {
+    if(isSplitRoute.value == true) {
+      Get.snackbar(
+          'Split Route',
+          'Please complete the split route operation first'
+      );
+      return; // Prevent cutting an employee if in split route mode
+    }
     if (cutEmployee.value != null) {
       var employees = routes[routeIndex].employees!;
       if (position >= 0 && position <= employees.length) {
+        print("Cut employee: ${cutEmployee.value?.nodalId}, Position: $position");
         employees.insert(position, cutEmployee.value!); // Use reactive variable's value
         cutEmployee.value = null; // Clear the cutEmployee after pasting
         await calculatePickupTimes(employees); // Recalculate pickup times for the updated route
         if (!modifiedRoutes.contains(routes[routeIndex])) {
           modifiedRoutes.add(routes[routeIndex]); // Add destination route
         }
-        print("Employee pasted to route $routeIndex at position $position");
       } else {
         print("Invalid position for paste operation");
       }
@@ -169,6 +197,13 @@ class RoasterController extends GetxController{
     }
   }
   Future<void> moveEmployeeUp(int routeIndex, int employeeIndex) async {
+     if(isSplitRoute.value == true) {
+      Get.snackbar(
+          'Split Route',
+          'Please complete the split route operation first'
+      );
+      return; // Prevent cutting an employee if in split route mode
+    }
     if (cutEmployee.value != null) {
       Get.snackbar(
           'Employee already cut',
@@ -184,6 +219,13 @@ class RoasterController extends GetxController{
       }    }
   }
   Future<void> moveEmployeeDown(int routeIndex, int employeeIndex) async {
+    if(isSplitRoute.value == true) {
+      Get.snackbar(
+          'Split Route',
+          'Please complete the split route operation first'
+      );
+      return; // Prevent cutting an employee if in split route mode
+    }
     if (cutEmployee.value != null) {
       Get.snackbar(
           'Employee already cut',
@@ -199,7 +241,6 @@ class RoasterController extends GetxController{
       }
     }
   }
-  var officeLocation = const LatLng(19.132296753365175, 73.00226250708334).obs;
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     try {
       ByteData data = await rootBundle.load(path);
@@ -221,20 +262,25 @@ class RoasterController extends GetxController{
         icon: BitmapDescriptor.fromBytes(markerIcon),
         infoWindow: const InfoWindow(title: 'Searched Location'),
       );
-
       Dialogmarkers.add(marker);
     } catch (e) {
       print('Error adding marker: $e');
     }
   }
+
   addNormalMarker(
       LatLng latLng,
+      bool isOffice
       )
-  {
+  async {
+    final Uint8List markerIcon = await getBytesFromAsset("assets/home.png", 30);
+    final Uint8List markerIconOffice = await getBytesFromAsset("assets/company.png", 50);
+
     final Marker marker = Marker(
       markerId: MarkerId(latLng.toString()),
       position: latLng,
-      icon: BitmapDescriptor.defaultMarker,
+      icon: isOffice? BitmapDescriptor.fromBytes(markerIconOffice):
+      BitmapDescriptor.fromBytes(markerIcon),
       infoWindow: const InfoWindow(title: 'Searched Location'),
     );
 
@@ -246,10 +292,18 @@ class RoasterController extends GetxController{
     );
     getRoaster();
   }
+
+  Future<void> switchBetweenNodalAndHome(
+      String roasterId
+      ) async {
+    await roasterService.switchBetweenNodalAndHome(
+        roasterId
+    );
+  }
   Future<void> _drawRoute(
       String originLatitude, String originLongitude,
-      String destinationLatitude, String destinationLongitude
-      ) async {
+      String destinationLatitude, String destinationLongitude,
+      bool isOffice) async {
     var headers = {
       'Content-Type': 'application/json'
     };
@@ -268,7 +322,18 @@ class RoasterController extends GetxController{
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
       print("response is here");
-      addNormalMarker(LatLng(double.parse(originLatitude), double.parse(originLongitude)));
+      if (isOffice == true) {
+        addNormalMarker(
+            LatLng(double.parse(originLatitude),
+                double.parse(originLongitude)),
+                true
+        );
+      }else {
+        addNormalMarker(
+            LatLng(double.parse(originLatitude),
+                double.parse(originLongitude)), false
+        );
+      }
       final data = json.decode(await response.stream.bytesToString());
       final points = data["data"]['routes'][0]['overview_polyline']['points'];
 
@@ -362,6 +427,7 @@ class RoasterController extends GetxController{
   Future<void> animateCameraToBounds(LatLngBounds bounds, {double padding = 50.0}) async {
     // Ensure the controller is available
     if (MapController.value.isCompleted) {
+      await Future.delayed(Duration(milliseconds: 200));
       final GoogleMapController controller = await MapController.value.future;
 
       try {
@@ -391,6 +457,7 @@ class RoasterController extends GetxController{
       officeLocation.value.longitude.toString(),
       routeModel.employees!.last.nodalLat!.toString(),
       routeModel.employees!.last.nodalLng!.toString(),
+      true,
     );
 
     // Iterate through the employees and draw routes between their nodal points.
@@ -407,6 +474,7 @@ class RoasterController extends GetxController{
         routeModel.employees![i].nodalLng.toString(),
         routeModel.employees![i - 1].nodalLat.toString(),
         routeModel.employees![i - 1].nodalLng.toString(),
+        false
       );
 
       // Add a marker after drawing the route for the current nodal point.
@@ -499,6 +567,7 @@ class RoasterController extends GetxController{
 
       if (Rxroasters.value.routes != null && Rxroasters.value.routes!.isNotEmpty) {
         routes.value = Rxroasters.value.routes!;
+        roasterTotal.value = Rxroasters.value.rosters?.length ?? 0;
         hasRoute.value = true;
       } else {
         hasRoute.value = false;
@@ -517,14 +586,15 @@ class RoasterController extends GetxController{
     loading.value = true;
     officeLoading.value = true;
    await Future.wait([
-
-      _settingsService.getAllShift(),
+     _settingsService.getAllShift(),
     nodalService.getAllNodalPoint(),
       _settingsService.getAllOffice(),
+    roasterService.getVehicleCapacity(),
     ]).then((value) {
       shiftList.value = value[0] as List<ShiftModel>;
       nodalList.value = value[1] as List<NodalPointModel>;
       officeList.value = value[2] as List<OfficeModel>;
+      vehicleList.value = value[3] as List<VehicleCapacity>;
     });
    for (var element in officeList) {
       officelist.add({element.name, element.id});
@@ -533,7 +603,6 @@ class RoasterController extends GetxController{
        for (var set in officelist) set.first: set.last
     };
      officeListMap.value = await map.keys.toList();
-
     officeLoading.value = false;
     loading.value = false;
 
@@ -574,7 +643,8 @@ class RoasterController extends GetxController{
         officeId.value,
         1,
         10,
-        selectedType.value
+        selectedType.value,
+        isSelectedVehicle
     );
   }
   approveVendor() async {
@@ -590,22 +660,50 @@ class RoasterController extends GetxController{
     );
     await getRoaster();
   }
-
   getVendor() async {
     vendorList.value = await vendorService.getVendorByCompanyId();
   }
   publishRoute() async {
-    await roasterService.publishRoute(
-        ApproveVendor
-    );
-    Get.snackbar(
-        'Route Published',
-        'Route has been published successfully',
+    // Check if all approved vendors have a vehicle assigned
+    final invalidRoutes = ApproveVendor.where((id) {
+      final route = Rxroasters.value.routes?.firstWhere(
+            (r) => r.id == id,
+        orElse: () => null as Routes,
+      );
+      return route == null || route.vehicleAssignedByVendor != true;
+    }).toList();
+
+    if (invalidRoutes.isNotEmpty) {
+      Get.snackbar(
+        'Error',
+        'One or more selected routes do not have vehicles assigned',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.red,
         colorText: Colors.white,
+      );
+      return;
+    }
+
+    // Proceed if all validations pass
+    await roasterService.publishRoute(ApproveVendor);
+    Get.snackbar(
+      'Route Published',
+      'Route has been published successfully',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
     );
   }
+  splitRoute() async {
+    await roasterService.splitRoute(
+     employeeSplit,
+      routeSplit.value!,
+    );
+
+  }
+
+
+
 
   @override
   void onInit() {

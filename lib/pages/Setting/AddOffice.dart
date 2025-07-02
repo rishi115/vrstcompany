@@ -402,17 +402,17 @@ class _AddOfficeState extends State<AddOffice> {
                   ),
                   InkWell(
                     onTap: () async {
-                      if(controller.selectedSupervisorId == false){
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: CustomText(
-                                text: 'Please select Supervisor',
-                                color: Colors.white,
-                              ),
-                              backgroundColor: Colors.red,
-                            ));
-                        return;
-                      }
+                      // if(controller.selectedSupervisorId == false){
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //       const SnackBar(
+                      //         content: CustomText(
+                      //           text: 'Please select Supervisor',
+                      //           color: Colors.white,
+                      //         ),
+                      //         backgroundColor: Colors.red,
+                      //       ));
+                      //   return;
+                      // }
                       if(controller.office.value.name == null || controller.office.value.name == ""){
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(

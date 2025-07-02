@@ -63,6 +63,7 @@ class CompanyCard extends GetView<VendorController> {
               children: [
                 ElevatedButton(
                   onPressed: () {
+                    controller.getVehiclesByVendorIdAndCompanyId(id);
                     controller.navigateToDetailsPage(id, context);
                   },
                   style: ElevatedButton.styleFrom(

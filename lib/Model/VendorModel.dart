@@ -94,3 +94,4 @@ class VendorModelById {
     return _data;
   }
 }
+

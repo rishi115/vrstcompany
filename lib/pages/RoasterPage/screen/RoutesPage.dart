@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:vrsstranslinkcompany/Model/RouteModel.dart';
 import 'package:vrsstranslinkcompany/pages/RoasterPage/RoasterController/RoasterController.dart';
 import '../../../constants/style.dart';
@@ -24,7 +25,7 @@ class RoutesWidget extends GetView<RoasterController> {
                 onTap: (){
                   Navigator.pushNamed(context, '/roaster');
                 },
-                child: CustomText(text: "Roasters",
+                child: CustomText(text: "Rosters",
                   size: 14,
                   weight: FontWeight.w400,
                 ),
@@ -37,10 +38,19 @@ class RoutesWidget extends GetView<RoasterController> {
               ),
               Spacer(),
               VerticalDivider(),
-              Image.asset("assets/SplitIcon.png",
-                height: 40.h,
-                width: 40.w,
+              Obx(()=>InkWell(
+                onTap: () async {
+                  controller.isSplitRoute.value = !controller.isSplitRoute.value;
+                },
+                child: Image.asset("assets/SplitIcon.png",fit: BoxFit.fill,
+                  height: 40.h,
+                  width: 40.w,
+                  color:  controller.isSplitRoute.value? active:lightGrey,
+                ),
+
               ),
+              ),
+
               VerticalDivider(),
               InkWell(
                 onTap: () async {
@@ -69,7 +79,8 @@ class RoutesWidget extends GetView<RoasterController> {
                       padding:  EdgeInsets.only(bottom:15.h),
                       child: Container(
                         decoration: BoxDecoration(
-                          color:   controller.routes[index].visibleToVendor! ? Colors.blue[100] : Colors.blueGrey[50],
+                          color:   controller.routes[index].visibleToVendor! ? controller.routes[index].published!? Colors.greenAccent: Colors.blue[100] : Colors.blueGrey[50],
+
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Padding(
@@ -89,9 +100,10 @@ class RoutesWidget extends GetView<RoasterController> {
                   controller.modifiedRoutes.isNotEmpty
                       ? InkWell(
                     onTap: () async {
-                    await controller.saveModifiedRoutes();
-                    },
-                    child: Container(
+                      await controller.saveModifiedRoutes();
+                      Get.snackbar("Success", "Changes saved successfully");
+                      },
+                      child: Container(
                       decoration: BoxDecoration(color: dark,
                           borderRadius: BorderRadius.circular(10)),
                       alignment: Alignment.center,
@@ -106,24 +118,53 @@ class RoutesWidget extends GetView<RoasterController> {
                     ),
                   )
                       : SizedBox.shrink(), // Render an empty space when the button is hidden
+
+                  controller.isSplitRoute.value==true && controller.employeeSplit.isNotEmpty
+                      ? InkWell(
+                    onTap: () async {
+                      await controller.splitRoute();
+                      Navigator.pushNamed(context,'/loading');
+                      await controller.getRoaster();
+                      Navigator.pop(context);
+                      controller.isSplitRoute.value = false;
+                      controller.employeeSplit.clear();
+                      controller.employeeSplitId.clear();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(color: dark,
+                          borderRadius: BorderRadius.circular(10)),
+                      alignment: Alignment.center,
+                      constraints:  const BoxConstraints(
+                        maxWidth:250,
+                      ),
+                      height: 40,
+                      child:  const CustomText(
+                        text: "Split Route",
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                      : SizedBox.shrink(), // Render an empty space when the button is hidden
                   const Spacer(),
                   Center(
                     child: InkWell(
-                      onTap:!controller.isApproveVendor.value ? () async {
-                        if(
-                        controller.ApproveVendor.length == 0
-                        ){
+                      onTap:!controller.isApproveVendor.value
+                          ? () async {
+                        if (controller.ApproveVendor.isEmpty) {
                           Get.snackbar("Error", "Please select a route to assign vendor");
                           return;
                         }
                         Navigator.pushNamed(context, "/loading");
-                        await controller.approveVendor();
-                        controller.isApproveVendor.value = true;
-                        controller.ApproveVendor.clear();
-
-                        Navigator.pop(context);
+                        try {
+                          await controller.approveVendor();
+                          controller.isApproveVendor.value = true;
+                          controller.ApproveVendor.clear();
+                        } finally {
+                          Navigator.pop(context); // Ensure pop happens even if approveVendor throws
+                        }
                       }
                           : null,
+
                       child: Container(
                         decoration: BoxDecoration(color: active,
                             borderRadius: BorderRadius.circular(10)),
@@ -145,7 +186,6 @@ class RoutesWidget extends GetView<RoasterController> {
                   Center(
                     child: InkWell(
                       onTap: controller.isApproveVendor.value ?(){
-
                         controller.publishRoute();
                       }: null,
                       child: Container(
@@ -195,8 +235,6 @@ class RoutesWidget extends GetView<RoasterController> {
   }
 }
 
-
-
 class routeList extends StatefulWidget {
   int Routeindex;
   routeList(this.Routeindex);
@@ -228,9 +266,12 @@ class _routeListState extends State<routeList> {
                     zoomGesturesEnabled: true,
                     zoomControlsEnabled: true,
                     polylines: controller.locationPolylines.toSet(),
-                    onMapCreated: (GoogleMapController Controller) {
-                      controller.MapController.value.complete(Controller);
-                    },
+                    // onMapCreated: (GoogleMapController Controller) {
+                      onMapCreated: (GoogleMapController mapController) async {
+                        if (!controller.MapController.value.isCompleted) {
+                          controller.MapController.value.complete(mapController);
+                        }
+                                  },
                     markers: {
                       Marker(
                         markerId: MarkerId('1'),
@@ -262,6 +303,44 @@ class _routeListState extends State<routeList> {
               ));
         },
       );
+    }
+    String? calculateTimeDifference(String start, String end) {
+      try {
+        final format = DateFormat.jm(); // Example: "8:29 PM"
+        DateTime now = DateTime.now();
+
+        DateTime startTime = format.parse(start);
+        DateTime endTime = format.parse(end);
+
+        // Assign today's date to both
+        startTime = DateTime(now.year, now.month, now.day, startTime.hour, startTime.minute);
+        endTime = DateTime(now.year, now.month, now.day, endTime.hour, endTime.minute);
+
+        // Handle next-day wraparound
+        if (endTime.isBefore(startTime)) {
+          endTime = endTime.add(Duration(days: 1));
+        }
+
+        final diff = endTime.difference(startTime);
+
+        final hours = diff.inHours;
+        final minutes = diff.inMinutes.remainder(60);
+
+        String hourStr = hours > 0 ? "$hours h${hours > 1 ? 's' : ''}" : "";
+        String minStr = minutes > 0 ? "$minutes m${minutes > 1 ? 's' : ''}" : "";
+
+        if (hourStr.isNotEmpty && minStr.isNotEmpty) {
+          return "$hourStr $minStr";
+        } else if (hourStr.isNotEmpty) {
+          return hourStr;
+        } else if (minStr.isNotEmpty) {
+          return minStr;
+        } else {
+          return "0 min";
+        }
+      } catch (e) {
+        return null;
+      }
     }
     void addVendor(BuildContext context){
       showDialog(
@@ -452,25 +531,32 @@ class _routeListState extends State<routeList> {
           padding:  EdgeInsets.symmetric(vertical: 8.h),
           child: Row(
             children: [
-              Obx(()=>
-                  SizedBox(
-                    width: 50.w,
-                    height: 50.h,
-                    child: Checkbox(
-                      value: controller.ApproveVendor.contains(routes.id),
-                      onChanged: controller.canSelectRoute(routes.vehicleAssignedByVendor!)
-                          ? (value) {
-                        if (value == true) {
-                          controller.ApproveVendor.add(routes.id!);
-                        } else {
-                          controller.ApproveVendor.remove(routes.id);
-                        }
-                      }
-                          : null,
-                      activeColor: routes.vehicleAssignedByVendor! ? Colors.blue : Colors.black,
-                    ),
-                  ),
-              ),
+              routes.published==true ? const Padding(
+                padding: EdgeInsets.only(left : 8.0),
+                child: Icon(Icons.check_circle, color: Colors.green),
+              ) :
+              Obx(() {
+                final routeId = routes.id!;
+                final isChecked = controller.ApproveVendor.contains(routeId);
+                final canSelect = controller.canSelectRoute(routes.vehicleAssignedByVendor!)  ;
+                final isVendorAssigned = routes.vehicleAssignedByVendor!;
+
+
+                return ApproveVendorCheckbox(
+                  routeId: routeId,
+                  canSelect: canSelect,
+                  isChecked: isChecked,
+                  isVendorAssigned: isVendorAssigned,
+                  onChanged: (value) {
+                    if (value == true) {
+                      controller.ApproveVendor.add(routeId);
+                    } else {
+                      controller.ApproveVendor.remove(routeId);
+                    }
+                  },
+                );
+              }),
+
               SizedBox(
                 width: 120.w,
                 child:  Column(
@@ -478,14 +564,14 @@ class _routeListState extends State<routeList> {
                     Center(
                       child: CustomText(
                         text:"RouteId",
-                        size: 13,
+                        size: 12,
                         color: lightGrey,
                       ),
                     ),
                     Center(
                       child: CustomText(
                         text: routes.id!.substring(routes.id!.length - 8),
-                        size: 13,
+                        size: 12,
                       ),
                     ),
 
@@ -507,14 +593,14 @@ class _routeListState extends State<routeList> {
                         Center(
                           child: CustomText(
                             text:"Vendor name",
-                            size: 13,
+                            size: 12,
                             color: lightGrey,
                           ),
                         ),
                         Center(
                           child: CustomText(
                             text: routes.vendorName?? 'Not Assigned',
-                            size: 13,
+                            size: 12,
                           ),
                         ),
 
@@ -529,14 +615,14 @@ class _routeListState extends State<routeList> {
                     Center(
                       child: CustomText(
                         text:"Vehicle Assigned",
-                        size: 13,
+                        size: 12,
                         color: lightGrey,
                       ),
                     ),
                     Center(
                       child: CustomText(
                         text: routes.vehicleAssignedByVendor?? false ? routes.vehicleNumber??"" : 'Not Assigned',
-                        size: 13,
+                        size: 12,
                       ),
                     ),
 
@@ -550,7 +636,7 @@ class _routeListState extends State<routeList> {
                     Center(
                       child: CustomText(
                         text:"Start Time",
-                        size: 13,
+                        size: 12,
                         color: lightGrey,
                       ),
                     ),
@@ -559,7 +645,7 @@ class _routeListState extends State<routeList> {
                         text: (routes.employeeCount == 0 || routes.employees == null || routes.employees!.isEmpty)
                             ? "-" // No employees or employee list is empty, show "-"
                             : routes.employees!.first.pickupTime ?? "-", // If first employee exists, show pickupTime, else show "-"
-                        size: 13,
+                        size: 12,
                       ),
                     )
 
@@ -574,14 +660,14 @@ class _routeListState extends State<routeList> {
                     Center(
                       child: CustomText(
                         text:"Start Point",
-                        size: 13,
+                        size: 12,
                         color: lightGrey,
                       ),
                     ),
                     Center(
                       child: CustomText(
                         text: routes.startPoint?? "-",
-                        size: 13,
+                        size: 12,
                       ),
                     ),
 
@@ -596,21 +682,24 @@ class _routeListState extends State<routeList> {
                     Center(
                       child: CustomText(
                         text:"Duration",
-                        size: 13,
+                        size: 12,
                         color: lightGrey,
                       ),
                     ),
                     Center(
                       child: CustomText(
-                        text: "${(routes.estimatedDuration)} min",
-                        size: 13,
+                        text:calculateTimeDifference(
+                            routes.employees?.first.pickupTime ?? "00:00",
+                            controller.shiftTime[0]
+                        )?? " "
+                        ,
+                        size: 12,
                       ),
                     ),
-
                   ],
                 ),
               ),
-              VerticalDivider(),
+              const VerticalDivider(),
               SizedBox(
                 width: 90.w,
                 child: Row(
@@ -628,7 +717,7 @@ class _routeListState extends State<routeList> {
                   ],
                 ),
               ),
-              Spacer(),
+              const Spacer(),
               InkWell(
                 onTap: () async {
                   await controller.pasteEmployeeToRoute(
@@ -657,7 +746,7 @@ class _routeListState extends State<routeList> {
                 ),
               ),
 
-              VerticalDivider(),
+              const VerticalDivider(),
               InkWell(
                 onTap: (){
                   controller.expandedList.contains(widget.Routeindex) ? controller.expandedList.remove(widget.Routeindex) :
@@ -688,26 +777,29 @@ class _routeListState extends State<routeList> {
                         children: [
                           Row(
                             children: [
-                              // Checkbox(
-                              //   value: controller.selectedRoute.contains(routes.id),
-                              //   onChanged: (value){
-                              //     if(value == true){
-                              //       controller.selectedRoute.add(
-                              //           routes.id!
-                              //       );
-                              //     }else{
-                              //       controller.selectedRoaster.remove(routes.id);
-                              //     }
-                              //
-                              //   }
-                              // ),
+                              Visibility(
+                                visible: controller.isSplitRoute.value,
+                                  child: Checkbox(
+                                 value: controller.employeeSplitId.contains(routes.employees![index].id),
+                                onChanged: (value){
+                                  if (value == true) {
+                                    controller.employeeSplitId.add(routes.employees![index].id!);
+                                    controller.employeeSplit.add(routes.employees![index]);
+                                    controller.routeSplit.value = routes;
+                                  } else {
+                                    controller.employeeSplitId.remove(routes.employees![index].id!);
+                                    controller.employeeSplit.remove(routes.employees![index]);
+                                    controller.routeSplit.value = null;
+                                  }
+                                 }
+                              )),
                               SizedBox(
                                 width: 100.w,
                                 child:  Center(
                                   child: CustomText(
                                     // text:"${current.employee?.employeeId}"
                                     text: routes.employees![index].employeeId!.substring(routes.employees![index].employeeId!.length - 8),
-                                    size: 13,
+                                    size: 12,
                                   ),
                                 ),
                               ),
@@ -724,7 +816,7 @@ class _routeListState extends State<routeList> {
                                   child: CustomText(
                                     // text: current.employee?.firstName ?? 'Employee Name',
                                       text: routes.employees![index].employeeName!,
-                                      size: 13
+                                      size: 12
                                   ),
                                 ),
                               ),
@@ -740,7 +832,7 @@ class _routeListState extends State<routeList> {
                                 child:  Center(
                                   child: CustomText(
                                       text: routes.employees![index].phoneNumber!,
-                                      size: 13
+                                      size: 12
                                   ),
                                 ),
                               ),
@@ -772,7 +864,7 @@ class _routeListState extends State<routeList> {
                                   child: CustomText(
                                     // text: current.nodalPoint?.address ?? 'Address',
                                       text: routes.employees![index].pickupTime!,
-                                      size: 13
+                                      size: 12
                                   ),
                                 ),
                               ),
@@ -827,8 +919,7 @@ class _routeListState extends State<routeList> {
                               ),
 
                             ],
-                          )
-                          ,
+                          ),
                           const Divider(),
                         ],
                       ),
@@ -843,6 +934,35 @@ class _routeListState extends State<routeList> {
         )
 
       ],
+    );
+  }
+}
+class ApproveVendorCheckbox extends StatelessWidget {
+  final String? routeId;
+  final bool canSelect;
+  final bool isChecked;
+  final Function(bool?)? onChanged;
+  final bool isVendorAssigned;
+
+  const ApproveVendorCheckbox({
+    super.key,
+    required this.routeId,
+    required this.canSelect,
+    required this.isChecked,
+    required this.onChanged,
+    required this.isVendorAssigned,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 50.w,
+      height: 50.h,
+      child: Checkbox(
+        value: isChecked,
+        onChanged: canSelect ? onChanged : null,
+        activeColor: isVendorAssigned ? Colors.blue : Colors.black,
+      ),
     );
   }
 }

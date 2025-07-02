@@ -19,7 +19,7 @@ import 'package:http/http.dart' as http;
 
 class EmployeeService {
   Future<void> registerEmployee(Employee employee,
-      String transportInactiveDate, String dateOfBirth,BuildContext context,
+      String transportInactiveDate, String dateOfBirth,BuildContext context,String nodalpointId,
       String joiningDate) async {
     String url = ApiStringConstants.baseurl + ApiStringConstants.addEmployee;
     try {
@@ -62,7 +62,7 @@ class EmployeeService {
             "company": companyId,
             "disability": employee.disability,
             "status": "active",
-            "nodalPoint": employee.nodalPoint,
+            "nodalPoint": nodalpointId,
           });
 
       if (response.data['message'] == 'Employee added successfully') {
@@ -94,7 +94,6 @@ class EmployeeService {
                       employee.longitude = '';
                       employee.age = '';
                       employee.disability = '';
-                      Navigator.pop(context);
                       Navigator.pop(context);
                     },
                     child: const Text('OK'),

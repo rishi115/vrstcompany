@@ -236,7 +236,6 @@ class EmployeePage extends GetView<EmployeeController> {
             IconButton(icon: Image.asset('assets/FilterImage.png',width: 36,height: 36,), onPressed: () {  },),
           ],
         ),
-
         const SizedBox(
           height: 20,
         ),

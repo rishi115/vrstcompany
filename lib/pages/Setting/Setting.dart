@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:vrsstranslinkcompany/pages/Setting/AddGuard.dart';
@@ -11,6 +10,7 @@ import '../../constants/controllers.dart';
 import '../../constants/style.dart';
 import '../../constants/responsiveness.dart';
 import '../../widgets/Button.dart';
+import '../../widgets/ShimmerEfflect.dart';
 import '../../widgets/custom_text.dart';
 
 
@@ -326,13 +326,13 @@ class Settings extends GetView<SettingController> {
               width: 0.3.sw, // Adjust the width of the map
               child: Obx(()=> GoogleMap(
                 initialCameraPosition: CameraPosition(
-                  target: LatLng(controller.officesList[index].latitude!, controller.officesList[index].latitude!),
+                  target: LatLng(controller.officesList[index].latitude!, controller.officesList[index].longitude!),
                   zoom: 14.0,
                 ),
                 markers: {
                   Marker(
                     markerId: const MarkerId('1'),
-                    position: LatLng(controller.officesList[index].latitude!, controller.officesList[index].latitude!),
+                    position: LatLng(controller.officesList[index].latitude!, controller.officesList[index].longitude!),
                   ),
                 },
                 // Inside the `onMapCreated` callback of your Google Map
@@ -363,7 +363,13 @@ class Settings extends GetView<SettingController> {
     }
     return ResponsiveWidget(largeScreen: SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: Column(
+      child:Obx(()=>
+      controller.isLoading.value
+          ? ShimmerList(
+        width: 0.3.sw,
+        height: 1.sh,
+      ):
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Obx(() => Row(
@@ -779,7 +785,7 @@ class Settings extends GetView<SettingController> {
                         weight: FontWeight.w400,
                       ),
                       SizedBox(
-                        width: 50.w,
+                        width: 140.w,
                       ),
                       CustomText(
                         text: "Address",
@@ -792,16 +798,17 @@ class Settings extends GetView<SettingController> {
                     ],
                   ),
                   Divider(),
-                  SingleChildScrollView(
+                  Obx(()=>
+                   SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Column(
-                        children: List.generate(controller.officesList.length, (index) =>
+                        children: List.generate(controller.guardList.length, (index) =>
                             Row(
                               children: [
                                 SizedBox(
                                   width:130.w,
                                   child: CustomText(
-                                    text: 'Employee name',
+                                    text: controller.guardList[index].firstName ?? "--",
                                     size:14,
                                   ),
                                 ),
@@ -812,7 +819,7 @@ class Settings extends GetView<SettingController> {
                                   width:60.w,
                                   child: Center(
                                     child: CustomText(
-                                        text: 'Male',
+                                        text: controller.guardList[index].gender ?? "--",
                                         size:14
                                     ),
                                   ),
@@ -825,7 +832,7 @@ class Settings extends GetView<SettingController> {
                                   width:50.w,
                                   child: Center(
                                     child: CustomText(
-                                        text: '45',
+                                        text: controller.guardList[index].age.toString() ?? "--",
                                         size:14
                                     ),
                                   ),
@@ -838,7 +845,7 @@ class Settings extends GetView<SettingController> {
                                   width:140.w,
                                   child: Center(
                                     child: CustomText(
-                                        text: '498983989303',
+                                        text: controller.guardList[index].contact.toString() ?? "--",
                                         size:14
                                     ),
                                   ),
@@ -850,7 +857,7 @@ class Settings extends GetView<SettingController> {
                                   width:40.w,
                                   child: Center(
                                     child: CustomText(
-                                        text: '12',
+                                        text: controller.guardList[index].listOfTrips.length.toString() ?? "--",
                                         size:14
                                     ),
                                   ),
@@ -862,7 +869,7 @@ class Settings extends GetView<SettingController> {
                                   width:270.w,
                                   child: Center(
                                     child: CustomText(
-                                        text: 'Samrat Nagar, majiwada niwas, Gandhi park pune east',
+                                        text: controller.guardList[index].address ?? "--",
                                         size:14
                                     ),
                                   ),
@@ -881,8 +888,7 @@ class Settings extends GetView<SettingController> {
                         )
                     ),
                   )
-
-
+                  )
                 ],
               ),
             ),
@@ -978,7 +984,7 @@ class Settings extends GetView<SettingController> {
                                     const SizedBox(width: 20),
                                     InkWell(
                                       onTap: () {
-                                        // Handle delete action here
+                                        controller.disableOffice(controller.officesList[index].id!);
                                       },
                                       child: Image.asset(
                                         'assets/Delete.png',
@@ -1004,7 +1010,7 @@ class Settings extends GetView<SettingController> {
 
 
         ],
-      ),
+      )),
     ),
     );
   }

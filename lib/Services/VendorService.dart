@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:vrsstranslinkcompany/Model/VendorModel.dart';
 
+import '../Model/VehicleAndDriverModel.dart';
 import '../helpers/SharedPreference/shared_preferences_constants.dart';
 import '../helpers/SharedPreference/shared_preferences_methods.dart';
 import '../helpers/api_constants.dart';
@@ -45,6 +46,31 @@ class VendorService{
       print('Error adding employee: $e');
     }
     return vendor;
+  }
+  Future<List<VehicleAndDriverModel>>getVehiclesByVendorIdAndCompanyId(
+      String vendorId
+      )
+  async{
+    List<VehicleAndDriverModel> list =[];
+    String url = ApiStringConstants.baseurl + ApiStringConstants.getVehiclesByVendorIdAndCompanyId;
+    String id = await getStringFromCache(SharedPreferenceString.companyId);
+    try {
+      String token = await getStringFromCache(
+          SharedPreferenceString.accessToken);
+      final response = await apiUtils.get(url: "$url$vendorId/$id",
+          options: Options(headers: {
+            'Authorization': 'Bearer $token',
+          }));
+      if (response.data['success'] == true) {
+          for( var curr in response.data['data']){
+            list.add(VehicleAndDriverModel.fromJson(curr));
+          }
+      }
+    } catch (e) {
+      print('Error adding employee: $e');
+    }
+
+    return list;
   }
 
 }

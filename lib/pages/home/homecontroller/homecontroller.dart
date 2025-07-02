@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:vrsstranslinkcompany/Model/EmployeeListModel.dart';
+import 'package:vrsstranslinkcompany/Model/GuardModel.dart';
+import 'package:vrsstranslinkcompany/Services/EmployeeService.dart';
 import 'package:vrsstranslinkcompany/Services/HomeService.dart';
 import 'package:vrsstranslinkcompany/Services/SettingsService.dart';
 
@@ -14,6 +17,7 @@ class HomeController extends GetxController {
   var shiftList = <ShiftModel>[].obs;
   final SettingsService settingsService = SettingsService();
   final HomeService homeService = HomeService();
+  final EmployeeService employeeService = EmployeeService();
   RxBool isLoading = false.obs;
   var selectedValue = <Map<String, dynamic>>[].obs; // Properly typed observable list
   var selectedShift = <String, dynamic>{}.obs; // Properly typed observable map
@@ -33,6 +37,12 @@ class HomeController extends GetxController {
       address: 'Kathmandu, Nepal',
     )
   ].obs;
+  var vehicleCount = 0.obs;
+  var employeeCount = 0.obs;
+  var employeeList = <EmployeeListModel>[].obs;
+  var guardList = <GaurdModel>[].obs;
+  var guardCount = 0.obs;
+
 
   getShiftList() async {
     isLoading.value = true;
@@ -44,8 +54,7 @@ class HomeController extends GetxController {
 
 
   }
-  getTripCount(
-      ) async {
+  getTripCount() async {
     tripAnalyticsLoading.value = true;
     tripAnalytics.value =
    await homeService.getTripCount(
@@ -61,7 +70,6 @@ class HomeController extends GetxController {
     );
     vendorDistributionLoading.value = false;
   }
-
   refreshApi() async {
     tripAnalyticsLoading.value = true;
     vendorDistributionLoading.value = true;
@@ -85,7 +93,6 @@ class HomeController extends GetxController {
     tripAnalyticsLoading.value = true;
     tripLoading.value = true;
     vendorDistributionLoading.value = true;
-
     await Future.wait([
       settingsService.getAllOffice(),
       settingsService.getAllShift(),
@@ -96,6 +103,8 @@ class HomeController extends GetxController {
       ),
       homeService.getTodayTripData(),
         homeService.getVendorDistribution(selectedShiftId.value),
+      employeeService.getAllEmployee(),
+      settingsService.getGuard(),
     ]).then((value) {
       officeList.value = value[0] as List<OfficeModel>;
       shiftList.value = value[1] as List<ShiftModel>;
@@ -160,12 +169,18 @@ class HomeController extends GetxController {
       tripLoading.value = false;
       VendorDistribution.value = value[4] as VendorDistributionModel;
       vendorDistributionLoading.value = false;
+      employeeList.value = value[5] as List<EmployeeListModel>;
+      employeeCount.value = employeeList.length;
+      guardList.value = value[6] as List<GaurdModel>;
+      guardCount.value = guardList.length;
+
+
+
+
 
     });
 
   }
-
-
 
   @override
   void onInit() {

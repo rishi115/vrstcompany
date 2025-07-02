@@ -1,5 +1,5 @@
 class ApiStringConstants {
-  static const String baseurl = 'https://vr-safetrips.onrender.com/api';
+  static const String baseurl = 'https://vrs-translink-main-server-27263944480.asia-south1.run.app/api';
   static const String companyLogin = '/company/login';
   static const String vendorLogin = '/vendor/login';
   static const String addEmployee = '/employee/register';
@@ -48,7 +48,13 @@ class ApiStringConstants {
   static const String getSupervisor='/employee/getSupervisors/';
   static const String makeEmployeeSupervisor='/employee/makeEmployeeSupervisor/';
   static const String updateRoute='/route/update/';
+  static const String splitRoute='/route/splitRoute/';
   static const String excelOfTripsByCompanyId='/report/excelOfTripsByCompanyId/';
   static const String getFileUrl='/extra/getUploadedUrl';
-
+  static const String getGuard ='/guard/getGuardsByCompanyId/';
+  static const String excelOfRoutesByCompanyId = '/report/excelOfRoutesByCompanyId/';
+  static const String excelOfTripsOfEmployeesByCompanyId = '/report/excelOfTripsOfEmployeesByCompanyId/';
+  static const String disableOffice = '/office/disable/';
+  static const String switchBetweenHomeAndNodal = '/roster/switchBetweenHomeAndNodal';
+  static const String getVehiclesByVendorIdAndCompanyId = '/vehicle/getVehiclesByVendorIdAndCompanyId/';
 }

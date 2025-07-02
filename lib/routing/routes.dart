@@ -45,8 +45,8 @@ const settingsPageRoute = "/settings";
 const nodalPointPageDisplayName = "Nodal Point";
 const nodalPointPageRoute = "/nodalpoint";
 
-const roasterPageDisplayName = "Roaster";
-const roasterPageRoute = "/roaster";
+const roasterPageDisplayName = "Roster";
+const roasterPageRoute = "/roster";
 
 
 const companyVendorPageDisplayName = "Company";

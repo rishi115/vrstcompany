@@ -39,5 +39,25 @@ void excelOfTrips() {
     );
   }
 
+  void excelOfRoutes() {
+    _reportService.excelOfRoutesByCompanyId(
+      'Routes Report',
+      routeStartDate.value,
+      routeEndDate.value,
+      tripType.value,
+      status.value,
+    );
+  }
+
+  void excelOfEmployee() {
+    _reportService.excelOfEmployeeByCompanyId(
+      'Employee Report',
+      employeeStartDate.value,
+      employeeEndDate.value,
+      tripType.value,
+    );
+  }
+
+
 
 }

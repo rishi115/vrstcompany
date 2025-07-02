@@ -8,6 +8,7 @@ import '../../constants/responsiveness.dart';
 import '../../constants/style.dart';
 import '../../widgets/InputField.dart';
 import '../../widgets/custom_text.dart';
+import '../NodalPoint/predictionField.dart';
 
 class AddGuard extends GetView<SettingController> {
   const AddGuard({super.key});
@@ -16,6 +17,7 @@ class AddGuard extends GetView<SettingController> {
   Widget build(BuildContext context) {
     List officesList = [{'Select','87687'}];
     List agencyList = [{'Select','87687'}];
+    List<String> gender = ['male', 'female', 'other'];
     for (var element in controller.officesList) {
       officesList.add({element.name, element.id});
     }
@@ -109,16 +111,35 @@ class AddGuard extends GetView<SettingController> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Field(
-                              context,
-                              'Gender',
-                              90,
-                              300,
-                              'Gender',
-                              TextEditingController(text: controller.guard.value.gender),
-                                  (value) => controller.guard..update((val) => val!.gender = value),
-                            ),
+                            Container(
+                              width:200.w,
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children:[
+                                    Padding(
+                                      padding:  EdgeInsets.all(8.w),
+                                      child: CustomText(
+                                        text: 'Gender',
+                                        size: 15.sp,
+                                        color: dark,
+                                        weight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Obx(() =>
+                                        DropDown(
+                                          context: context,
+                                          title: "Gender",
+                                          items: gender,
+                                          onChanged: (value) {
+                                            controller.guard.update((val) => val?.gender = value);
+                                          },
+                                          selectedItem:  controller.guard.value.gender==null?
+                                          'male':controller.guard.value.gender!,
+                                        ),),
+                                  ]
+                              ),
 
+                            ),
                             Field(
                               context,
                               'Age',
@@ -230,15 +251,16 @@ class AddGuard extends GetView<SettingController> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Field(
-                              context,
-                              'Address',
-                              90,
-                              300,
-                              'Address',
-                              TextEditingController(text: controller.guard.value.address),
-                                  (value) => controller.guard.update((val) => val!.address = value),
+                            SizedBox(
+                              width: 250.w,
+                              child: AddressField(
+                                controller: TextEditingController(text: controller.guard.value.address),
+                                onChanged: (value) {
+                                  controller.guard.value.address = value;
+                                },
+                              ),
                             ),
+
                             Field(
                               context,
                               'City',
@@ -562,6 +584,7 @@ void showGuardAgencyDialog(
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context); // Close the dialog
+                        controller.clearGuardData();
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.red,

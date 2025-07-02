@@ -65,71 +65,112 @@ class BarChartSample1 extends StatelessWidget {
 
   BarChartData mainBarData(List<Map<String, dynamic>> monthsData) {
     return BarChartData(
-      maxY: 16,
-      groupsSpace: 20,
+      maxY: 20,
+      groupsSpace: 16,
       barTouchData: BarTouchData(
+        enabled: true,
         touchTooltipData: BarTouchTooltipData(
+          tooltipRoundedRadius: 8,
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
-            String month = monthsData[group.x]['month'].toString().toUpperCase();
+            final month = monthsData[group.x]['month'].toString().toUpperCase();
             return BarTooltipItem(
               '$month\n',
               const TextStyle(
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
                 fontSize: 14,
+                fontWeight: FontWeight.w700,
               ),
-              children: <TextSpan>[
+              children: [
                 TextSpan(
-                  text: rod.toY.toString(),
+                  text: '${rod.toY.toInt()} trips',
                   style: const TextStyle(
-                    color: Colors.yellowAccent,
-                    fontSize: 12,
+                    color: Colors.tealAccent,
                     fontWeight: FontWeight.w500,
+                    fontSize: 12,
                   ),
-                ),
+                )
               ],
             );
           },
         ),
       ),
       titlesData: FlTitlesData(
-        show: true,
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 5,
+            reservedSize: 36,
+            getTitlesWidget: (value, meta) => Text(
+              value.toInt().toString(),
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            getTitlesWidget: (value, meta) => getTitles(value, meta, monthsData),
-            reservedSize: 28,
-          ),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            interval: 4,
-            reservedSize: 40,
+            reservedSize: 30,
             getTitlesWidget: (value, meta) {
-              return Text(
-                '${value.toInt()}',
-                style: const TextStyle(color: Colors.grey, fontSize: 10),
+              final monthName = value.toInt() < monthsData.length
+                  ? monthsData[value.toInt()]['month'].substring(0, 3).toUpperCase()
+                  : '';
+              return SideTitleWidget(
+                axisSide: meta.axisSide,
+                child: Text(
+                  monthName,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
               );
             },
           ),
         ),
+        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
       ),
       borderData: FlBorderData(show: false),
-      barGroups: showingGroups(monthsData),
-      gridData: const FlGridData(
+      gridData: FlGridData(
         show: true,
-        drawHorizontalLine: true,
         drawVerticalLine: false,
+        horizontalInterval: 5,
+        getDrawingHorizontalLine: (value) => FlLine(
+          color: Colors.grey.withOpacity(0.2),
+          strokeWidth: 1,
+        ),
       ),
+      barGroups: List.generate(monthsData.length, (i) {
+        final y = monthsData[i]['count']?.toDouble() ?? 0.0;
+        return BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              toY: y > 20 ? 20 : y,
+              gradient: const LinearGradient(
+                colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+              ),
+              width: 14,
+              borderRadius: BorderRadius.circular(6),
+              backDrawRodData: BackgroundBarChartRodData(
+                show: true,
+                toY: 20,
+                color: Colors.grey.withOpacity(0.15),
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
+
 
   List<BarChartGroupData> showingGroups(List<Map<String, dynamic>> monthsData) {
     return List.generate(monthsData.length, (i) {
@@ -578,19 +619,15 @@ class HomePage extends GetView<HomeController> {
                     SizedBox(
                       width: 20.w,
                     ),
-                    counts(
-                      "Vehicles",
-                      0,
-                      "Total trips completed",
-                    ),
                     SizedBox(
                       width: 20.w,
                     ),
+                    Obx(()=>
                     counts(
                       "Employees",
-                      0,
+                      controller.employeeCount.value,
                       "Total trips completed",
-                    ),
+                    )),
                     SizedBox(
                       width: 20.w,
                     ),
@@ -613,7 +650,7 @@ class HomePage extends GetView<HomeController> {
                             ),
                             Container(
                               width: 350.w,
-                              height: 710.h,
+                              height: 810.h,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(18.r),
                                 color: Colors.white,
@@ -640,7 +677,7 @@ class HomePage extends GetView<HomeController> {
                                           width: 10.w,
                                         ),
                                         CustomText(
-                                          text:"Roasters",
+                                          text:"Rosters",
                                           size: 12.sp,
                                         ),
                                       ],
@@ -704,12 +741,12 @@ class HomePage extends GetView<HomeController> {
                         ? Align(
                       alignment: Alignment.center,
                       child:  ShimmerList(
-                        width:  710.h,
+                        width:  810.h,
                         height: 300.w,
                       ),
-                    )
-                        : Container(
-                      height: 710.h,
+                    ) :
+                    Container(
+                      height: 810.h,
                       width: 300.w,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(18.r),

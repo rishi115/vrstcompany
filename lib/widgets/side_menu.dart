@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:vrsstranslinkcompany/constants/controllers.dart';
 import 'package:vrsstranslinkcompany/constants/style.dart';
 import 'package:vrsstranslinkcompany/constants/responsiveness.dart';
@@ -18,56 +19,35 @@ class CompanySideMenu extends StatelessWidget {
 
     return Container(
             color: light,
-            child: ListView(
+            child: Column(
               children: [
-                if(ResponsiveWidget.isSmallScreen(context))
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(width: width / 48),
-
-                        const Flexible(
-                          child: CustomText(
-                            text: "Shambhavi Tours & Travels",
-                            size: 20,
-                            weight: FontWeight.bold,
-                            color: active,
-                          ),
-                        ),
-                        SizedBox(width: width / 48),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                  ],
+                Divider(color: lightGrey.withOpacity(.1), ),
+                SizedBox(
+                  height: 110.h,
                 ),
-                    Divider(color: lightGrey.withOpacity(.1), ),
-
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: companySideMenuItemRoutes
-                      .map((item) => SideMenuItem(
-                          itemName: item.name,
-                          onTap: () {
-                            if(item.route == authenticationPageRoute){
-                              removeAllFromCache();
-                              menuController.changeActiveItemTo(homePageDisplayName);
-                            }
-                            if (!menuController.isActive(item.name)) {
-                              menuController.changeActiveItemTo(item.name);
-                              if(ResponsiveWidget.isSmallScreen(context)) {
-                                Get.back();
-                              }
-                              navigationController.navigateTo(item.route);
-                            }
-                          }))
-                      .toList(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: companySideMenuItemRoutes
+                          .map((item) => SideMenuItem(
+                              itemName: item.name,
+                              onTap: () {
+                                if(item.route == authenticationPageRoute){
+                                  removeAllFromCache();
+                                  menuController.changeActiveItemTo(homePageDisplayName);
+                                }
+                                if (!menuController.isActive(item.name)) {
+                                  menuController.changeActiveItemTo(item.name);
+                                  if(ResponsiveWidget.isSmallScreen(context)) {
+                                    Get.back();
+                                  }
+                                  navigationController.navigateTo(item.route);
+                                }
+                              }))
+                          .toList(),
+                    ),
+                  ),
                 )
               ],
             ),

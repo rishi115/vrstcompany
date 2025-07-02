@@ -13,8 +13,11 @@ import 'controllers/navigation_controller.dart';
 import 'helpers/GlobalContext.dart';
 import 'routing/routes.dart';
 import 'package:vrsstranslinkcompany/controllers/menu_controller.dart' as menu_controller;
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+
 
 Future<void> main() async {
+  setUrlStrategy(PathUrlStrategy());
   Get.put(menu_controller.MenuController());
   Get.put(NavigationController());
   await Get.putAsync(() => AuthService().init());
@@ -46,7 +49,7 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
             name: prelogin, page: (){
-         return const PreLogin();
+            return const PreLogin();
         })
       ],
       debugShowCheckedModeBanner: false,

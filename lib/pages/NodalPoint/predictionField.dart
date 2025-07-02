@@ -44,8 +44,6 @@ class GooglePlacesService {
   }
 }
 
-
-
 class AddressField extends StatefulWidget {
   final TextEditingController controller;
   final Function(String) onChanged;
@@ -58,11 +56,10 @@ class AddressField extends StatefulWidget {
 
 class _AddressFieldState extends State<AddressField> {
   List<String> predictions = [];
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
 
-  // Call this function as the user types
   void _onTextChanged(String input) async {
-    print('Input: $input');
-
     List<String> result = await GooglePlacesService.getPlacePredictions(input);
     setState(() {
       predictions = result;
@@ -70,67 +67,97 @@ class _AddressFieldState extends State<AddressField> {
 
     widget.onChanged(input);
 
-    // widget.onChanged(input);
+    _showOverlay();
+  }
+
+  void _showOverlay() {
+    _overlayEntry?.remove(); // Remove previous overlay
+    if (predictions.isEmpty) return;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          offset: Offset(0, 50), // Adjust based on UI
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              color: Colors.white,
+              constraints: BoxConstraints(maxHeight: 370.h),
+              child: Padding(
+                padding: EdgeInsets.only(top: 8.0), // Adjust space below TextField
+                child: Column(
+                  children: predictions.map((prediction) {
+                    return ListTile(
+                      title: Text(prediction),
+                      onTap: () {
+                        widget.controller.text = prediction;
+                        widget.onChanged(prediction);
+                        setState(() {
+                          predictions.clear();
+                        });
+                        _overlayEntry?.remove(); // Close overlay
+                      },
+                    );
+                  }).toList(),
+                ),
+              )
+
+
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  @override
+  void dispose() {
+    _overlayEntry?.remove();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding:  EdgeInsets.all(8.w),
-          child: CustomText(
-            text: "Address",
-            size: ResponsiveWidget.isLargeScreen(context)?15.sp:ResponsiveWidget.isSmallScreen(context)?15.sp *4:15.sp *1.4,
-            color: dark,
-            weight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(
-          height: 10.h,
-        ),
-        // The Address Input Field
-        TextField(
-          controller: widget.controller,
-          style: TextStyle(color: Colors.black,
-            fontSize: 15.sp,),
-          decoration: InputDecoration(
-            hintText:"Enter Address",
-            hintStyle: TextStyle(color: Colors.black,
-              fontSize:15.sp,),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25.r),
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(8.w),
+            child: CustomText(
+              text: "Address",
+              size: ResponsiveWidget.isLargeScreen(context)
+                  ? 15.sp
+                  : ResponsiveWidget.isSmallScreen(context)
+                  ? 15.sp * 4
+                  : 15.sp * 1.4,
+              color: dark,
+              weight: FontWeight.bold,
             ),
           ),
-          onChanged: _onTextChanged, // Trigger onTextChanged on input change
-        ),
-
-        // Display predictions as suggestions
-        if (predictions.isNotEmpty)
-          Container(
-            color: Colors.white,
-            height: 270.h,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(children: List.generate(predictions.length, (index) {
-                return ListTile(
-                  title: Text(predictions[index]),
-                  onTap: () {
-                    widget.controller.text = predictions[index]; // Set the selected address
-                    widget.onChanged(predictions[index]);
-                    setState(() {
-                      predictions.clear(); // Clear predictions after selection
-                    });
-                  },
-                );
-              }),
-                  ),
+          SizedBox(height: 10.h),
+          TextField(
+            controller: widget.controller,
+            style: TextStyle(color: Colors.black, fontSize: 15.sp),
+            decoration: InputDecoration(
+              hintText: "Enter Address",
+              hintStyle: TextStyle(color: Colors.black, fontSize: 15.sp),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.r),
+              ),
             ),
-          )
-    ],
+            onChanged: _onTextChanged,
+          ),
+        ],
+      ),
     );
   }
 }

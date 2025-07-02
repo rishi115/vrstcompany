@@ -24,6 +24,7 @@ class NodalPointController extends  GetxController {
 
 
 
+
   getAllNodal() async {
     islandLoading.value = true;
     await Future.wait([
@@ -54,7 +55,6 @@ class NodalPointController extends  GetxController {
 
 
   Future<void> getLatLngFromAddress(String address) async {
-    print('Address: $address');
     const String apiKey = 'AIzaSyCE-07OqyB1ze3XgMCta9qH95p4bhENiLg'; // Replace with your API key
 
     final Dio dio = Dio();
@@ -96,6 +96,7 @@ class NodalPointController extends  GetxController {
   assignEmployeeToNodal(String nodalId) async {
    await  nodalService.assignEmployeeToNodal(selectedId,nodalId);
     Get.snackbar('Success', 'Employee Assigned Successfully');
+    selectedId.clear();
     getAllNodal();
   }
     selectedEmployeeId(String id) {

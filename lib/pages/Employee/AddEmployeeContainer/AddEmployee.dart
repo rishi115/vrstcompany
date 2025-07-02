@@ -143,7 +143,7 @@ class AddEmployeePage extends GetView<EmployeeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding:  EdgeInsets.all(18.h),
+                      padding:  EdgeInsets.all(10.h),
                       child: AddEmployeeLarge(),
                     ),
                     const SizedBox(

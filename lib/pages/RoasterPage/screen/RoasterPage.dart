@@ -202,6 +202,8 @@ class RoasterPage extends GetView<RoasterController> {
                                       if (newValue != null) {
                                         controller.selectedShift.value = newValue;
                                         controller.shiftId.value = newValue.value;
+                                        controller.shiftTime.value =[ newValue.label];
+
                                       }
                                     },
                                     items: options.map((ValueItem item) {
@@ -253,7 +255,7 @@ class RoasterPage extends GetView<RoasterController> {
                               fontsize: 15,
                               context: context,
                               title: "Select Office",
-                              items: controller.officeListMap as List<String>,
+                              items: controller.officeListMap,
                               onChanged: (value) {
                                 controller.officeId.value = controller.map[value]!;
                                 controller.officeName.value = value!;
@@ -312,7 +314,7 @@ class RoasterPage extends GetView<RoasterController> {
                     ),
                   ),
                 ),
-                SizedBox(
+                    SizedBox(
                   width: 20.w,
                 )
               ],

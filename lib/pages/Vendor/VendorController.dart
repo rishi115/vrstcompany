@@ -3,18 +3,26 @@ import 'package:vrsstranslinkcompany/Services/VendorService.dart';
 import 'package:flutter/material.dart';
 import 'package:vrsstranslinkcompany/pages/Vendor/vendorDetails/VendorDetails.dart';
 
+import '../../Model/VehicleAndDriverModel.dart';
 import '../../Model/VendorModel.dart';
 import '../LoadingScreen/loadingScreen.dart';
 
 class VendorController extends GetxController{
 var vendorList = [].obs;
 final  vendorDetails = VendorModelById().obs;
-
+var listOfVehicleAndDriver = <VehicleAndDriverModel>[].obs;
 final VendorService vendorService = VendorService();
 
   void getVendorByCompanyId() async {
     vendorList.value = await vendorService.getVendorByCompanyId();
   }
+  Future<void> getVehiclesByVendorIdAndCompanyId(
+      String id
+      ) async {
+    listOfVehicleAndDriver.value = await vendorService.getVehiclesByVendorIdAndCompanyId(id);
+  }
+
+
 Future<void> navigateToDetailsPage(String id, BuildContext context) async {
   try {
 

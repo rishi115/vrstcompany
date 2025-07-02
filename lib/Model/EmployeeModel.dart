@@ -56,6 +56,7 @@ class Employee {
     this.locality,
     this.latitude,
     this.longitude,
+    this.nodalPoint
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) {

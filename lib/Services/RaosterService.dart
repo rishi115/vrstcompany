@@ -39,6 +39,47 @@ class RoasterService {
     }
     return roasters!;
   }
+  Future<void> switchBetweenNodalAndHome(
+      String roasterId
+      ) async {
+    try {
+      String url = '${ApiStringConstants.baseurl}${ApiStringConstants.switchBetweenHomeAndNodal}';
+      String token = await getStringFromCache(SharedPreferenceString.accessToken);
+
+      // Append the company ID as a query parameter
+      String fullUrl = '$url/$roasterId';
+
+      // Make the GET request without a body
+      var response = await apiUtils.get(
+        url: fullUrl,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      // Handle the response
+      if (response.data['success'] == true) {
+        Get.snackbar(
+          'Success',
+          'Switched between Nodal and Home',
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          'Failed to switch between Nodal and Home',
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to switch between Nodal and Home',
+      );
+    }
+
+  }
+
 
   Future<void> getRoutes(
       String date,
@@ -46,17 +87,23 @@ class RoasterService {
       String office,
       int page,
       int limit,
-      String tripType
+      String tripType,
+      List<String> listOfVehicles
       ) async {
     String companyId = await getStringFromCache(SharedPreferenceString.companyId);
     String url = '${ApiStringConstants.baseurl}${ApiStringConstants.getRoutes}?company=$companyId&date=$date&shift=$shift&office=$office&tripType=$tripType&page=1&limit=10';
-    List<RouteModel> routes = [];
+
     try {
       String token = await getStringFromCache(SharedPreferenceString.accessToken);
-      final response = await apiUtils.get(url: url,
+      final response = await apiUtils.post(url: url,
           options: Options(headers: {
             'Authorization': 'Bearer $token',
-          }));
+          },),
+        data: {
+          "listOfVehicles": listOfVehicles
+        }
+
+      );
       if (response.data['success'] == true) {
 
       }
@@ -270,6 +317,7 @@ class RoasterService {
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
           },
         ),
         data: {
@@ -282,6 +330,53 @@ class RoasterService {
             "Route updated successfully: ${response.data['data']}");
       } else {
         print("Failed to update route: ${response.data}");
+      }
+    } catch (e) {
+      print('Error Updating Route: $e');
+    }
+  }
+  Future<void> splitRoute(List<Employees> employees,Routes route) async {
+    String url = ApiStringConstants.baseurl + ApiStringConstants.splitRoute;
+    try {
+      String token = await getStringFromCache(SharedPreferenceString.accessToken);
+
+      // Convert the employees list to JSON
+      List<Map<String, dynamic>> employeesJson = employees.map((e) => e.toJson()).toList();
+
+      final response = await apiUtils.put(
+        url: url + route.id!,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: {
+
+            "_id": route.id,
+            "employees": employeesJson,
+            "startPoint": route.startPoint,
+            "endPoint":route.endPoint,
+            "shift": route.shift,
+            "date": route.date,
+            "tripType": route.tripType,
+            "vendor": route.vendor,
+            "vendorName": route.vendorName,
+            "office": route.office,
+            "company": route.company,
+            "__v": 0
+
+        },
+      );
+
+      if (response.statusCode ==  200 ) {
+        print("Route split successfully: ${response.data['data']}");
+        Get.snackbar('Success', 'Route split successfully');
+      } else if (response.statusCode == 400) {
+        Get.snackbar('Error', 'Failed to split route: ${response.data['message']}');
+      } else {
+        Get.snackbar('Error', 'Unexpected error occurred while splitting route');
+        print("Failed to split route: ${response.data}");
       }
     } catch (e) {
       print('Error Updating Route: $e');

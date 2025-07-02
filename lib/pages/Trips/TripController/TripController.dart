@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:vrsstranslinkcompany/Model/TripData.dart';
+import 'package:vrsstranslinkcompany/Services/ReportService.dart';
 import 'package:vrsstranslinkcompany/Services/TripService.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import '../../../constants/style.dart';
 class TripController extends GetxController {
   RxString monthYear = "${Month[DateTime.now().month]}  ${DateTime.now().year.toString().substring(2)}".obs;
   final TripService tripService = TripService();
+  final ReportService reportService = ReportService();
   RxString day = DateTime.now().day.toString().obs; // Corrected day assignment
   RxString selectedDriver = "Driver 1".obs;
   RxBool loading = false.obs;
@@ -56,7 +58,6 @@ class TripController extends GetxController {
   var locationPolylines = <Polyline>[].obs;
   var Dialogmarkers = <Marker>[].obs;
 
-  var officeLatlong = LatLng( 19.212930275061744, 72.97406369445206);
   addNormalMarker(
       LatLng latLng,
       )
@@ -101,6 +102,7 @@ class TripController extends GetxController {
       print("response is here");
       addNormalMarker(LatLng(double.parse(originLatitude), double.parse(originLongitude)));
       final data = json.decode(await response.stream.bytesToString());
+      print("data is here: ${data['data']}");
       final points = data["data"]['routes'][0]['overview_polyline']['points'];
 
       try {
@@ -159,8 +161,8 @@ class TripController extends GetxController {
       );
       addNormalMarker(
           LatLng(
-             officeLatlong.latitude,
-              officeLatlong.longitude
+              originLatitude,
+              originLongitude
           )
       );
       return;
@@ -195,12 +197,22 @@ class TripController extends GetxController {
     );
     addNormalMarker(
         LatLng(
-            officeLatlong.latitude,
-            officeLatlong.longitude
+            originLatitude,
+            originLongitude
         )
     );
 
 
+  }
+
+  getTripData(){
+    reportService.excelOfTripsByCompanyId(
+        "report",
+        selectedDate.value.toString().split(' ')[0],
+        selectedDate.value.toString().split(' ')[0],
+        "all",
+      "active"
+    );
   }
 
 

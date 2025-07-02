@@ -302,6 +302,7 @@ class Routes {
   }
 }
 
+
 class Employees {
   String? employeeId;
   String? employeeName;
@@ -310,8 +311,9 @@ class Employees {
   String? nodalName;
   double? nodalLat;
   double? nodalLng;
-  double? nodalDistance;
-  String? nodalZone;
+  int? nodalDistance;
+  dynamic nodalZone;
+  String? nodalAddress;
   double? homeLat;
   double? homeLng;
   PickupLocation? pickupLocation;
@@ -323,7 +325,7 @@ class Employees {
   String? rosterId;
   String? id;
 
-  Employees({this.employeeId, this.employeeName, this.gender, this.nodalId, this.nodalName, this.nodalLat, this.nodalLng, this.nodalDistance, this.nodalZone, this.homeLat, this.homeLng, this.pickupLocation, this.dropLocation, this.pickupTime, this.dropTime, this.phoneNumber, this.attendance, this.rosterId, this.id});
+  Employees({this.employeeId, this.employeeName, this.gender, this.nodalId, this.nodalName, this.nodalLat, this.nodalLng, this.nodalDistance, this.nodalZone, this.nodalAddress, this.homeLat, this.homeLng, this.pickupLocation, this.dropLocation, this.pickupTime, this.dropTime, this.phoneNumber, this.attendance, this.rosterId, this.id});
 
   Employees.fromJson(Map<String, dynamic> json) {
     employeeId = json["employeeId"];
@@ -335,6 +337,7 @@ class Employees {
     nodalLng = json["nodalLng"];
     nodalDistance = json["nodalDistance"];
     nodalZone = json["nodalZone"];
+    nodalAddress = json["nodalAddress"];
     homeLat = json["homeLat"];
     homeLng = json["homeLng"];
     pickupLocation = json["pickupLocation"] == null ? null : PickupLocation.fromJson(json["pickupLocation"]);
@@ -358,6 +361,7 @@ class Employees {
     _data["nodalLng"] = nodalLng;
     _data["nodalDistance"] = nodalDistance;
     _data["nodalZone"] = nodalZone;
+    _data["nodalAddress"] = nodalAddress;
     _data["homeLat"] = homeLat;
     _data["homeLng"] = homeLng;
     if(pickupLocation != null) {

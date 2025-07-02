@@ -146,11 +146,15 @@ class EmployeeDetails extends GetView<EmployeeController> {
                               SizedBox(
                                 width: 10.w,
                               ),
-                              Text(
-                                employee.locality ?? "Not Assigned",
-                                style: TextStyle(
-                                    fontSize: 15.sp,
-                                    color: Colors.black
+                              SizedBox(
+                                width: 200.w,
+                                height: 30.h,
+                                child: Text(
+                                  employee.locality ?? "Not Assigned",
+                                  style: TextStyle(
+                                      fontSize: 15.sp,
+                                      color: Colors.black
+                                  ),
                                 ),
                               ),
                             ],

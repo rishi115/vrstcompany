@@ -11,199 +11,220 @@ import '../../constants/responsiveness.dart';
 
 class TripsScreen extends GetView<TripController> {
   TripsScreen({Key? key}) : super(key: key);
-  tripRow({
+  Widget tripRow({
     required String driver,
     required String vehicleModel,
     required String startTime,
     required String endTime,
     required String profile,
     required String status,
-    required String employee
+    required String employee,
   }) {
+    final bool isActive = status.toLowerCase() == 'active';
+    final Color statusColor = isActive ? Colors.green : Colors.grey;
+
     return Container(
-      padding:  EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
-      color: background,
+      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+      margin: EdgeInsets.only(bottom: 8.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-            // flex: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                      "Driver",
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                      )
-                  ),
-                  Text(
-                    "$driver",
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                    ),
-                  )
-                ],
-              )
-          ),
-
-          SizedBox(
-            width: 10.w,
-          ),
-
-          Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Vehicle model",
-                    style: TextStyle(
-                      fontSize: 12.sp,),
-                  ),
-                  Text(
-                    "$vehicleModel",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                    ),
-                  )
-                ],
-              )
-          ),
-          SizedBox(
-            width: 10.w,
-          ),
-
-          Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Employee",
-                    style: TextStyle(
-                      fontSize: 12.sp,),
-                  ),
-                  Text(
-                    employee,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                    ),
-                  )
-                ],
-              )
-          ),
-
-          SizedBox(
-            width: 10.w,
-          ),
-
-          Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Start time",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                  Text(
-                    "$startTime",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                    ),
-                  )
-                ],
-              )
-          ),
-          SizedBox(
-            width: 10.w,
-          ),
-          Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "End time",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                  Text(
-                    "$endTime",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                    ),
-                  )
-                ],
-              )
-          ),
-
-          SizedBox(
-            width: 10.w,
-          ),
-          Row(
-            children: [
-              Image.asset(
-                  "assets/profile.png",
-                  width: 30,
-                  height: 30
-              ),
-
-              SizedBox(
-                width: 10,
-              ),
-
-              Text(
-                "$profile",
-                style: TextStyle(
-                  color: lightGrey,
-                  fontSize: 14.sp,
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            width: 10.w,
-          ),
-
+          // Driver Column with avatar
           Row(
             children: [
               Container(
-                width: 6.w,
-                height: 6.h,
+                width: 40.w,
+                height: 40.h,
                 decoration: BoxDecoration(
-                  color: active,
                   shape: BoxShape.circle,
+                  color: Colors.blue[50],
+                ),
+                child: Center(
+                  child: Text(
+                    driver.isNotEmpty ? driver[0].toUpperCase() : 'D',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue[700],
+                    ),
+                  ),
                 ),
               ),
-
-              SizedBox(
-                width: 5.w,
+              SizedBox(width: 12.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    driver,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: dark,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    'Driver',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
-
-              Text(
-                "$status",
-                style: TextStyle(
-                  color: active,
-                  fontSize: 10.sp,
-                ),
-              )
             ],
-          )
+          ),
 
+          Spacer(),
+
+          // Vehicle Info
+          _infoColumn(
+            title: 'Vehicle',
+            value: vehicleModel,
+            icon: Icons.directions_car,
+          ),
+
+          Spacer(),
+
+          // Employee Info
+          _infoColumn(
+            title: 'Employee',
+            value: employee,
+            icon: Icons.person,
+          ),
+
+          Spacer(),
+
+          // Time Range
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.access_time, size: 14.sp, color: Colors.grey[600]),
+                  SizedBox(width: 4.w),
+                  Text(
+                    'Time',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                '$startTime - $endTime',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: dark,
+                ),
+              ),
+            ],
+          ),
+
+          Spacer(),
+
+          // Passengers
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.people_outline, size: 18.sp, color: Colors.grey[600]),
+              SizedBox(height: 4.h),
+              Text(
+                profile,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: dark,
+                ),
+              ),
+            ],
+          ),
+
+          Spacer(),
+
+          // Status Badge
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 8.w,
+                  height: 8.h,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: 6.w),
+                SizedBox(
+                  width: 70.w,
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                      color: statusColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-  Widget buildTripDetailRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(width: 8),
-          Text(value),
-        ],
-      ),
+
+  Widget _infoColumn({
+    required String title,
+    required String value,
+    IconData? icon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            if (icon != null) Icon(icon, size: 14.sp, color: Colors.grey[600]),
+            if (icon != null) SizedBox(width: 4.w),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 11.sp,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w500,
+            color: dark,
+          ),
+        ),
+      ],
     );
   }
   @override
@@ -352,10 +373,15 @@ class TripsScreen extends GetView<TripController> {
                           ),
                         ),
 
-                        SizedBox(
-                          width: 207.w,
-                          height: 55.h,
-                          child: Button("EXPORT AS CSV", 207, 14, 40),
+                        InkWell(
+                          onTap: () {
+                            controller.getTripData();
+                          },
+                          child: SizedBox(
+                            width: 207.w,
+                            height: 55.h,
+                            child: Button("EXPORT AS CSV", 207, 14, 40),
+                          ),
                         )
                       ],
                     ),
@@ -376,8 +402,8 @@ class TripsScreen extends GetView<TripController> {
                               onTap: () async {
                                await  controller.routeFromCompany(
                                     controller.tripList[index].providedRoute!,
-                                    controller.officeLatlong.latitude,
-                                    controller.officeLatlong.longitude
+                                    controller.tripList[index].office!.latitude!,
+                                 controller.tripList[index].office!.longitude!,
                                 );
                                Navigator.push(
                                   context,

@@ -9,6 +9,7 @@ import '../helpers/api_utils.dart';
 class RouteService{
   Future<List<RouteModel>> getRoutes() async {
     List<RouteModel> Route = [];
+
     try {
       String url = '${ApiStringConstants.baseurl}${ApiStringConstants.getRouteByVendorId}';
       String token = await getStringFromCache(SharedPreferenceString.accessToken);
@@ -38,6 +39,7 @@ class RouteService{
 
     return Route;
   }
+
   Future<void> assignVehicleAndDriverToRoute(
       String routeId, String vehicleId, String driverId
       )async{

@@ -199,6 +199,14 @@ class ReportUI extends GetView<ReportController> {
                   child: Center(
                     child: InkWell(
                       onTap: (){
+                        if(
+                        tripDate.value.isNotEmpty && tripEndDate.value.isNotEmpty && controller.tripType.value.isNotEmpty && controller.status.value.isNotEmpty){
+                          controller.excelOfTrips();
+                        }else{
+                          Get.snackbar(
+                              "Error","Please Fill All Fields"
+                          );
+                        }
 
                       },
                       child: Container(

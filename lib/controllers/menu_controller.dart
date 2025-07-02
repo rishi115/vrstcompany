@@ -50,6 +50,8 @@ class MenuController extends GetxController {
         return _customIcon('assets/Helpdesk.png', itemName);
       case authenticationPageDisplayName:
         return _customIcon('assets/Logout.png', itemName);
+      case reportPageDisplayName :
+        return _customIcon("assets/ReportIcon.png", itemName);
       default:
         return _customIcon('assets/home.png', itemName);
     }

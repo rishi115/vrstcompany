@@ -24,7 +24,10 @@ class SiteLayout extends StatelessWidget {
           largeScreen: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Expanded(child: CompanySideMenu()),
+              const Expanded(
+                  child:
+                  CompanySideMenu()
+              ),
               Expanded(
                 flex: 5,
                 child: Container(

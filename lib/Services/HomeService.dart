@@ -41,8 +41,8 @@ class HomeService{
   }
   Future<List<TripData>> getTodayTripData() async {
     String companyId = await getStringFromCache(SharedPreferenceString.companyId);
-    // String url = '${ApiStringConstants.baseurl}/trip/getTodaysTrip/$companyId';
-    String url = '${ApiStringConstants.baseurl}/trip/getTodaysTrip/67663221a5d41f503ca209d2';
+    String url = '${ApiStringConstants.baseurl}/trip/getTodaysTrip/$companyId';
+    // String url = '${ApiStringConstants.baseurl}/trip/getTodaysTrip/67663221a5d41f503ca209d2';
     List<TripData> tripList = [];
     try {
       // Fetch the token from shared preferences

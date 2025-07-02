@@ -57,6 +57,7 @@ class SettingsService {
           }));
       if (response.data['success'] == true) {
         print('shift deleted successfully');
+        Get.snackbar('Success', 'Shift deleted successfully');
       }
     } catch (e) {
       print('Error adding shift: $e');
@@ -140,7 +141,7 @@ String primaryEmail,
           }),
           data:   {
             "name": agencyName,
-            "listOfCompanies": [companyId],
+            "company": companyId,
             "address": address,
             "primaryContact": primaryContact,
             "primaryEmail": primaryEmail,
@@ -152,6 +153,11 @@ String primaryEmail,
       if (response.data['success'] == true) {
         print('Office added successfully');
         Navigator.pop(context);
+        agencyName='';
+        address='';
+        primaryContact='';
+        primaryEmail='';
+
       }
     } catch (e) {
       print('Error adding office: $e');
@@ -162,13 +168,16 @@ String primaryEmail,
       Guard guard,
       BuildContext context
       ) async {
+
     String companyId = await getStringFromCache(
         SharedPreferenceString.companyId);
 
     String url = ApiStringConstants.baseurl + ApiStringConstants.addGuard;
+
     try {
       String token = await getStringFromCache(
           SharedPreferenceString.accessToken);
+      
       final response = await apiUtils.post(url: url,
           options: Options(headers: {
             'Authorization': 'Bearer $token',
@@ -197,12 +206,49 @@ String primaryEmail,
       if (response.data['success'] == true) {
         print('Office added successfully');
         Navigator.pop(context);
+        guard.firstName = '';
+        guard.middleName = '';
+        guard.lastName = '';
+        guard.address = '';
+        guard.contactNumber = '';
+        guard.age = '';
+        guard.latitude = '';
+        guard.longitude = '';
+        guard.office = '';
+        guard.agency = '';
+        guard.photo = '';
+        guard.adharCard = '';
+        guard.uid = '';
       }else{
         Get.snackbar('Error', response.data['message']);
       }
     } catch (e) {
       print('Error adding office: $e');
     }
+  }
+
+  Future<List<GaurdModel>> getGuard() async {
+    String url = "${ApiStringConstants.baseurl}${ApiStringConstants.getGuard}";
+    List<GaurdModel> guardList = [];
+    try {
+      String companyId = await getStringFromCache(
+          SharedPreferenceString.companyId);
+      String token = await getStringFromCache(
+          SharedPreferenceString.accessToken);
+      final response = await apiUtils.get(url: "$url$companyId",
+          options: Options(headers: {
+            'Authorization': 'Bearer $token',
+          }));
+      if (response.data['success'] == true) {
+        print('got all guard successfully');
+        for (var item in response.data['data']) {
+          guardList.add(GaurdModel.fromJson(item));
+        }
+      }
+    } catch (e) {
+      print('Error adding agency: $e');
+    }
+    return guardList;
   }
 
 
@@ -229,8 +275,6 @@ String primaryEmail,
     }
     return officeList;
   }
-
-
   Future<List<OfficeModel>> getAllOffice() async {
     String url = "${ApiStringConstants.baseurl}${ApiStringConstants.getOffice}";
     List<OfficeModel> officeList = [];
@@ -253,6 +297,24 @@ String primaryEmail,
       print('Error adding office: $e');
     }
     return officeList;
+  }
+
+  Future<void> disableOffice(String officeId) async {
+    String url = ApiStringConstants.baseurl + ApiStringConstants.disableOffice;
+    try {
+      String token = await getStringFromCache(
+          SharedPreferenceString.accessToken);
+      final response = await apiUtils.get(
+          url: "$url$officeId",
+          options: Options(headers: {
+            'Authorization': 'Bearer $token',
+          }));
+      if (response.data['success'] == true) {
+       Get.snackbar('Success', 'Office disabled successfully');
+      }
+    } catch (e) {
+      print('Error adding office: $e');
+    }
   }
 
   Future<List<SupervisorModel>> getSupervisor() async {

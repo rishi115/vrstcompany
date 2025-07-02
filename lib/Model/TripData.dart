@@ -15,7 +15,7 @@ class TripByDate {
   String? company;
   Driver? driver;
   dynamic guard;
-  String? office;
+  Office? office;
   bool? started;
   String? startDateTime;
   String? endDateTime;
@@ -29,9 +29,8 @@ class TripByDate {
   String? createdAt;
   String? updatedAt;
   int? v;
-  String? tripStartTime;
 
-  TripByDate({this.id, this.shift, this.date, this.isGuard, this.isGuardLoggedIn, this.capacity, this.approxStartTime, this.approxEndTime, this.listOfEmployees, this.tripType, this.vendor, this.vehicle, this.company, this.driver, this.guard, this.office, this.started, this.startDateTime, this.endDateTime, this.status, this.providedRoute, this.travelledRoute, this.ota, this.otd, this.driverName, this.vehicleNumber, this.createdAt, this.updatedAt, this.v, this.tripStartTime});
+  TripByDate({this.id, this.shift, this.date, this.isGuard, this.isGuardLoggedIn, this.capacity, this.approxStartTime, this.approxEndTime, this.listOfEmployees, this.tripType, this.vendor, this.vehicle, this.company, this.driver, this.guard, this.office, this.started, this.startDateTime, this.endDateTime, this.status, this.providedRoute, this.travelledRoute, this.ota, this.otd, this.driverName, this.vehicleNumber, this.createdAt, this.updatedAt, this.v});
 
   TripByDate.fromJson(Map<String, dynamic> json) {
     id = json["_id"];
@@ -49,7 +48,7 @@ class TripByDate {
     company = json["company"];
     driver = json["driver"] == null ? null : Driver.fromJson(json["driver"]);
     guard = json["guard"];
-    office = json["office"];
+    office = json["office"] == null ? null : Office.fromJson(json["office"]);
     started = json["started"];
     startDateTime = json["startDateTime"];
     endDateTime = json["endDateTime"];
@@ -63,7 +62,6 @@ class TripByDate {
     createdAt = json["createdAt"];
     updatedAt = json["updatedAt"];
     v = json["__v"];
-    tripStartTime = json["tripStartTime"];
   }
 
   Map<String, dynamic> toJson() {
@@ -91,7 +89,9 @@ class TripByDate {
       _data["driver"] = driver?.toJson();
     }
     _data["guard"] = guard;
-    _data["office"] = office;
+    if(office != null) {
+      _data["office"] = office?.toJson();
+    }
     _data["started"] = started;
     _data["startDateTime"] = startDateTime;
     _data["endDateTime"] = endDateTime;
@@ -109,7 +109,6 @@ class TripByDate {
     _data["createdAt"] = createdAt;
     _data["updatedAt"] = updatedAt;
     _data["__v"] = v;
-    _data["tripStartTime"] = tripStartTime;
     return _data;
   }
 }
@@ -129,6 +128,34 @@ class ProvidedRoute {
     final Map<String, dynamic> _data = <String, dynamic>{};
     _data["lat"] = lat;
     _data["lng"] = lng;
+    return _data;
+  }
+}
+
+class Office {
+  String? id;
+  String? name;
+  double? latitude;
+  double? longitude;
+  String? address;
+
+  Office({this.id, this.name, this.latitude, this.longitude, this.address});
+
+  Office.fromJson(Map<String, dynamic> json) {
+    id = json["_id"];
+    name = json["name"];
+    latitude = json["latitude"];
+    longitude = json["longitude"];
+    address = json["address"];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["_id"] = id;
+    _data["name"] = name;
+    _data["latitude"] = latitude;
+    _data["longitude"] = longitude;
+    _data["address"] = address;
     return _data;
   }
 }
@@ -183,16 +210,17 @@ class Vehicle {
 class ListOfEmployees {
   String? employeeId;
   String? employeeName;
+  String? gender;
   String? nodalId;
   String? nodalName;
   String? nodalAddress;
   double? nodalLat;
   double? nodalLng;
-  double? nodalDistance;
+  int? nodalDistance;
   double? homeLat;
   int? otp;
   double? homeLng;
-  String? nodalZone;
+  dynamic nodalZone;
   String? pickupTime;
   PickupLocation? pickupLocation;
   DropLocation? dropLocation;
@@ -200,11 +228,12 @@ class ListOfEmployees {
   String? status;
   String? id;
 
-  ListOfEmployees({this.employeeId, this.employeeName, this.nodalId, this.nodalName, this.nodalAddress, this.nodalLat, this.nodalLng, this.nodalDistance, this.homeLat, this.otp, this.homeLng, this.nodalZone, this.pickupTime, this.pickupLocation, this.dropLocation, this.phoneNumber, this.status, this.id});
+  ListOfEmployees({this.employeeId, this.employeeName, this.gender, this.nodalId, this.nodalName, this.nodalAddress, this.nodalLat, this.nodalLng, this.nodalDistance, this.homeLat, this.otp, this.homeLng, this.nodalZone, this.pickupTime, this.pickupLocation, this.dropLocation, this.phoneNumber, this.status, this.id});
 
   ListOfEmployees.fromJson(Map<String, dynamic> json) {
     employeeId = json["employeeId"];
     employeeName = json["employeeName"];
+    gender = json["gender"];
     nodalId = json["nodalId"];
     nodalName = json["nodalName"];
     nodalAddress = json["nodalAddress"];
@@ -227,6 +256,7 @@ class ListOfEmployees {
     final Map<String, dynamic> _data = <String, dynamic>{};
     _data["employeeId"] = employeeId;
     _data["employeeName"] = employeeName;
+    _data["gender"] = gender;
     _data["nodalId"] = nodalId;
     _data["nodalName"] = nodalName;
     _data["nodalAddress"] = nodalAddress;

@@ -38,6 +38,8 @@ class SettingController extends GetxController {
   PlatformFile? objFile;
   var image = ''.obs;
   var adharCard = ''.obs;
+  var guardList =[].obs;
+  var isLoading =false.obs;
 
 
   Future<String> chooseFileUsingFilePicker() async {
@@ -97,15 +99,23 @@ class SettingController extends GetxController {
   deleteShift(
       String id
       )
-  {
-    _settingsService.deleteShift(
+  async {
+   await _settingsService.deleteShift(
       id
     );
     _settingsService.getAllShift();
   }
 
-  getAllShift() async {
+  disableOffice(
+      String id
+      ){
+    _settingsService.disableOffice(
+      id);
+    _settingsService.getAllOffice();
+  }
 
+
+  getAllShift() async {
     await _settingsService.getAllShift().then((value) {
       shiftList.value = value;
     });
@@ -115,19 +125,20 @@ class SettingController extends GetxController {
       agencyList.value = value;
     });
   }
-createShift() async {
+  createShift() async {
   await  _settingsService.createShift(
       DateFormat('h:mm a').format(logintime.value).toString(),
       DateFormat('h:mm a').format(logouttime.value).toString(),);
   _settingsService.getAllShift();
-
   }
 addGuard(
     BuildContext context
     ) async {
     guard.value.photo = image.value;
     guard.value.adharCard = adharCard.value;
-  await _settingsService.addGuard(guard.value,context);}
+  await _settingsService.addGuard(guard.value,context);
+    getGuard();
+  }
 
   Future<void> addOffice(
       BuildContext context
@@ -139,8 +150,22 @@ addGuard(
     } catch (error) {
       print("Failed to add office: $error");
     } finally {
+      getAllOffice();
       loading.value = false;
     }
+  }
+
+  clearGuardData(){
+    guard.value.firstName = '';
+    guard.value.lastName = '';
+    guard.value.address = '';
+    guard.value.contactNumber = '';
+    guard.value.age = '';
+    guard.value.office = '';
+    guard.value.latitude = '';
+    guard.value.longitude = '';
+    image.value = '';
+    adharCard.value = '';
   }
 
   Future<void> addAgency(
@@ -161,28 +186,41 @@ addGuard(
     } catch (error) {
       print("Failed to add agency: $error");
     } finally {
+      getAgency();
       loading.value = false;
     }
 
   }
 
 
-void allApi() {
-    Future.wait([
+getGuard(){
+  _settingsService.getGuard().then((value) {
+    guardList.value = value;
+  });
+
+}
+
+
+Future<void> allApi() async {
+    isLoading.value=true;
+    await Future.wait([
     _settingsService.getAllShift(),
      _settingsService.getAllOffice(),
       _settingsService.getSupervisor(),
       _settingsService.getAllAgency(),
+      _settingsService.getGuard(),
 
     ]).then((value) {
       shiftList.value = value[0] as List<ShiftModel>;
       officesList.value = value[1] as List<OfficeModel>;
       supervisorList.value = value[2] as List<SupervisorModel>;
       agencyList.value = value[3] as List<AgencyList>;
+      guardList.value = value[4] as List<GaurdModel>;
     });
     for (var element in officesList) {
       officeName.add(element.name!);
     }
+    isLoading.value=false;
 }
 void getSupervisor(){
     _settingsService.getSupervisor().then((value) {
